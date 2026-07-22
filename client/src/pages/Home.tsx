@@ -1,25 +1,40 @@
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import Hero from "@/components/sections/Hero";
+import ProtocolOverview from "@/components/sections/ProtocolOverview";
+import WhyPulse from "@/components/sections/WhyPulse";
+import ProtocolArchitecture from "@/components/sections/ProtocolArchitecture";
+import Developers from "@/components/sections/Developers";
+import Roadmap from "@/components/sections/Roadmap";
 
 /**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Best Practices, Design Guide and Common Pitfalls
+ * Home Page - Protocol Website
+ * 
+ * Sections:
+ * 1. Hero
+ * 2. Protocol Overview
+ * 3. Why Pulse (Features)
+ * 4. Protocol Architecture
+ * 5. Developers
+ * 6. Roadmap
+ * 7. Footer
  */
-export default function Home() {
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
 
+export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <main className="pt-16">
+        <Hero />
+        <ProtocolOverview />
+        <WhyPulse />
+        <ProtocolArchitecture />
+        <Developers />
+        <Roadmap />
       </main>
+
+      <Footer />
     </div>
   );
 }
