@@ -3,7 +3,7 @@ import { ArrowDown } from "lucide-react";
 
 /**
  * Protocol Architecture Section
- * 
+ *
  * Shows the protocol flow: Factory → Trading Engine → Price Engine → Vault → Settlement
  */
 

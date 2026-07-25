@@ -21,7 +21,7 @@ function Router() {
     <Switch>
       {/* Protocol Website */}
       <Route path={"/"} component={Home} />
-      
+
       {/* DApp Routes */}
       <Route path={"/app"} component={DAppHome} />
       <Route path={"/app/explore"} component={Explore} />
@@ -31,7 +31,7 @@ function Router() {
       <Route path={"/app/profile"} component={Profile} />
       <Route path={"/app/leaderboard"} component={Leaderboard} />
       <Route path={"/app/settings"} component={Settings} />
-      
+
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

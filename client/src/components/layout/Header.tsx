@@ -5,7 +5,7 @@ import { useState } from "react";
 
 /**
  * Header Component
- * 
+ *
  * Navigation header with logo and CTA buttons
  */
 
@@ -58,9 +58,7 @@ export default function Header() {
             >
               Enter App
             </Button>
-            <Button
-              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
-            >
+            <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
               Docs
             </Button>
           </div>

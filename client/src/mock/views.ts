@@ -29,7 +29,8 @@ export const mockViews: View[] = [
     tvl: 2500000,
     volume24h: 850000,
     participants: 1250,
-    image: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1518546305927-30bbc8299301?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1518546305927-30bbc8299301?w=500&h=300&fit=cropfit=crop",
+    image:
+      "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1518546305927-30bbc8299301?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1518546305927-30bbc8299301?w=500&h=300&fit=cropfit=crop",
     createdAt: "2024-07-20T10:30:00Z",
     trending: true,
     featured: true,
@@ -46,7 +47,8 @@ export const mockViews: View[] = [
     tvl: 1800000,
     volume24h: 620000,
     participants: 890,
-    image: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1621761191319-c6fb62b50faa?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1621761191319-c6fb62b50faa?w=500&h=300&fit=cropfit=crop",
+    image:
+      "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1621761191319-c6fb62b50faa?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1621761191319-c6fb62b50faa?w=500&h=300&fit=cropfit=crop",
     createdAt: "2024-07-19T14:20:00Z",
     trending: true,
     featured: true,
@@ -63,7 +65,8 @@ export const mockViews: View[] = [
     tvl: 1200000,
     volume24h: 450000,
     participants: 650,
-    image: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1677442d019cecf8e5004a9b53db39b5f7e3d5d5?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1677442d019cecf8e5004a9b53db39b5f7e3d5d5?w=500&h=300&fit=cropfit=crop",
+    image:
+      "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1677442d019cecf8e5004a9b53db39b5f7e3d5d5?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1677442d019cecf8e5004a9b53db39b5f7e3d5d5?w=500&h=300&fit=cropfit=crop",
     createdAt: "2024-07-18T09:15:00Z",
     trending: false,
     featured: true,
@@ -80,7 +83,8 @@ export const mockViews: View[] = [
     tvl: 3100000,
     volume24h: 920000,
     participants: 1540,
-    image: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1639762681033-6461a109a4b3?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1639762681033-6461a109a4b3?w=500&h=300&fit=cropfit=crop",
+    image:
+      "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1639762681033-6461a109a4b3?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1639762681033-6461a109a4b3?w=500&h=300&fit=cropfit=crop",
     createdAt: "2024-07-17T16:45:00Z",
     trending: true,
     featured: false,
@@ -97,7 +101,8 @@ export const mockViews: View[] = [
     tvl: 650000,
     volume24h: 180000,
     participants: 420,
-    image: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1618005182384-a83a8e7b9b19?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1618005182384-a83a8e7b9b19?w=500&h=300&fit=cropfit=crop",
+    image:
+      "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1618005182384-a83a8e7b9b19?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1618005182384-a83a8e7b9b19?w=500&h=300&fit=cropfit=crop",
     createdAt: "2024-07-16T11:30:00Z",
     trending: false,
     featured: false,
@@ -114,7 +119,8 @@ export const mockViews: View[] = [
     tvl: 2200000,
     volume24h: 750000,
     participants: 1100,
-    image: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=500&h=300&fit=cropfit=crop",
+    image:
+      "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=500&h=300&fit=croph=300https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=500&h=300&fit=cropfit=crop",
     createdAt: "2024-07-15T13:20:00Z",
     trending: true,
     featured: false,

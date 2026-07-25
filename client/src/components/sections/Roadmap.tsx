@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 
 /**
  * Roadmap Section
- * 
+ *
  * Shows protocol versions: V1, V2, V3 and beyond
  */
 
@@ -99,7 +99,9 @@ export default function Roadmap() {
               >
                 <Card className="h-full p-8 bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-purple-500/20 hover:border-purple-500/50 transition-all duration-300">
                   {/* Version Badge */}
-                  <div className={`inline-block px-4 py-2 rounded-full bg-gradient-to-r ${item.color} text-white text-sm font-semibold mb-4`}>
+                  <div
+                    className={`inline-block px-4 py-2 rounded-full bg-gradient-to-r ${item.color} text-white text-sm font-semibold mb-4`}
+                  >
                     {item.version}
                   </div>
 

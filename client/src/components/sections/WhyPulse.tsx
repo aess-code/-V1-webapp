@@ -4,7 +4,7 @@ import { Lock, Zap, Users } from "lucide-react";
 
 /**
  * Why Pulse Section
- * 
+ *
  * Highlights three core features with hover animations
  */
 
@@ -12,17 +12,20 @@ const features = [
   {
     icon: Lock,
     title: "Permissionless",
-    description: "Anyone can create a market on any outcome without approval or intermediaries.",
+    description:
+      "Anyone can create a market on any outcome without approval or intermediaries.",
   },
   {
     icon: Zap,
     title: "Fully On-chain",
-    description: "100% transparent and verifiable. All logic lives on the blockchain.",
+    description:
+      "100% transparent and verifiable. All logic lives on the blockchain.",
   },
   {
     icon: Users,
     title: "Anyone Can Create",
-    description: "Creators earn fees from their markets. No gatekeeping, pure meritocracy.",
+    description:
+      "Creators earn fees from their markets. No gatekeeping, pure meritocracy.",
   },
 ];
 

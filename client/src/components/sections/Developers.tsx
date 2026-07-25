@@ -4,7 +4,7 @@ import { Code2, Zap, Globe } from "lucide-react";
 
 /**
  * Developers Section
- * 
+ *
  * Highlights SDK, API, and open ecosystem for builders
  */
 
@@ -106,8 +106,9 @@ export default function Developers() {
               Builder Friendly
             </h3>
             <p className="text-foreground/60 max-w-2xl mx-auto">
-              Pulse is designed for developers. With comprehensive documentation,
-              example code, and an active community, building on Pulse is fast and fun.
+              Pulse is designed for developers. With comprehensive
+              documentation, example code, and an active community, building on
+              Pulse is fast and fun.
             </p>
           </motion.div>
         </motion.div>
