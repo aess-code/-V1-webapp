@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 /**
  * Protocol Overview Section
- * 
+ *
  * Introduces what Pulse Protocol is and why it exists
  */
 
@@ -44,7 +44,8 @@ export default function ProtocolOverview() {
               What is Pulse Protocol?
             </h2>
             <p className="text-lg text-foreground/60 max-w-2xl mx-auto">
-              A decentralized infrastructure for creating and trading on any outcome
+              A decentralized infrastructure for creating and trading on any
+              outcome
             </p>
           </motion.div>
 
@@ -57,8 +58,9 @@ export default function ProtocolOverview() {
                   The Problem
                 </h3>
                 <p className="text-foreground/70 leading-relaxed">
-                  Prediction markets are fragmented and centralized. Creators have limited
-                  control, traders face high fees, and the ecosystem lacks composability.
+                  Prediction markets are fragmented and centralized. Creators
+                  have limited control, traders face high fees, and the
+                  ecosystem lacks composability.
                 </p>
               </div>
 
@@ -67,9 +69,9 @@ export default function ProtocolOverview() {
                   The Solution
                 </h3>
                 <p className="text-foreground/70 leading-relaxed">
-                  Pulse is a permissionless protocol where anyone can create markets on any
-                  outcome. Fully on-chain, transparent, and composable with the entire DeFi
-                  ecosystem.
+                  Pulse is a permissionless protocol where anyone can create
+                  markets on any outcome. Fully on-chain, transparent, and
+                  composable with the entire DeFi ecosystem.
                 </p>
               </div>
 
@@ -78,9 +80,10 @@ export default function ProtocolOverview() {
                   Why Decentralized Views Matter
                 </h3>
                 <p className="text-foreground/70 leading-relaxed">
-                  Decentralized prediction markets enable collective intelligence. They
-                  aggregate information from thousands of participants, creating the most
-                  accurate price discovery mechanism.
+                  Decentralized prediction markets enable collective
+                  intelligence. They aggregate information from thousands of
+                  participants, creating the most accurate price discovery
+                  mechanism.
                 </p>
               </div>
             </motion.div>
@@ -92,9 +95,7 @@ export default function ProtocolOverview() {
             >
               <div className="text-center">
                 <div className="text-6xl mb-4">📊</div>
-                <p className="text-foreground/60">
-                  Visual diagram coming soon
-                </p>
+                <p className="text-foreground/60">Visual diagram coming soon</p>
               </div>
             </motion.div>
           </div>

@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 
 /**
  * Hero Section - Minimalist Protocol Aesthetic
- * 
+ *
  * Design Philosophy:
  * - Large whitespace with centered content
  * - Dynamic purple-blue gradient background
@@ -31,7 +31,7 @@ export default function Hero() {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
-             transition: { duration: 0.6 },
+      transition: { duration: 0.6 },
     },
   };
 
@@ -102,8 +102,8 @@ export default function Hero() {
           variants={itemVariants}
           className="text-lg text-foreground/60 mb-12 max-w-2xl mx-auto leading-relaxed"
         >
-          A decentralized protocol for permissionless market creation and prediction.
-          Build, trade, and stake on any outcome.
+          A decentralized protocol for permissionless market creation and
+          prediction. Build, trade, and stake on any outcome.
         </motion.p>
 
         {/* CTA Buttons */}

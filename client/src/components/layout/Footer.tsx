@@ -2,7 +2,7 @@ import { Github, Twitter, MessageCircle, FileText } from "lucide-react";
 
 /**
  * Footer Component
- * 
+ *
  * Links to GitHub, Documentation, X (Twitter), Discord, Privacy, Terms
  */
 
@@ -22,11 +22,13 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <h3 className="text-lg font-bold text-foreground mb-2">Pulse</h3>
-            <p className="text-foreground/60 text-sm">Decentralized prediction protocol</p>
+            <p className="text-foreground/60 text-sm">
+              Decentralized prediction protocol
+            </p>
           </div>
 
           {/* Links */}
-          {links.map((link) => {
+          {links.map(link => {
             const Icon = link.icon;
             return (
               <div key={link.label}>
@@ -48,10 +50,16 @@ export default function Footer() {
             © 2024 Pulse Protocol. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <a href="#" className="text-foreground/60 hover:text-foreground text-sm transition-colors">
+            <a
+              href="#"
+              className="text-foreground/60 hover:text-foreground text-sm transition-colors"
+            >
               Privacy Policy
             </a>
-            <a href="#" className="text-foreground/60 hover:text-foreground text-sm transition-colors">
+            <a
+              href="#"
+              className="text-foreground/60 hover:text-foreground text-sm transition-colors"
+            >
               Terms of Service
             </a>
           </div>

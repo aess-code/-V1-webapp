@@ -9,7 +9,7 @@ import Roadmap from "@/components/sections/Roadmap";
 
 /**
  * Home Page - Protocol Website
- * 
+ *
  * Sections:
  * 1. Hero
  * 2. Protocol Overview
@@ -24,7 +24,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="pt-16">
         <Hero />
         <ProtocolOverview />
