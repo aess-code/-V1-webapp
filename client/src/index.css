@@ -43,74 +43,118 @@
 }
 
 :root {
-  --primary: oklch(0.7 0.2 280);
-  --primary-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.65 0.18 275);
+  /* ========================================================================
+   * Pulse Protocol - Official Brand Colors
+   * ======================================================================== */
+  
+  /* Primary Brand Colors (from official logo) */
+  --primary: oklch(0.57 0.16 255);           /* Blue #2563EB */
+  --primary-foreground: oklch(1 0 0);        /* White */
+  --primary-light: oklch(0.71 0.15 231);     /* Cyan #0EA5E9 */
+  --primary-dark: oklch(0.58 0.18 290);      /* Purple #7C3AED */
+  
+  /* Sidebar Primary */
+  --sidebar-primary: oklch(0.57 0.16 255);   /* Blue */
   --sidebar-primary-foreground: oklch(1 0 0);
-  --chart-1: oklch(0.7 0.2 280);
-  --chart-2: oklch(0.65 0.18 270);
-  --chart-3: oklch(0.6 0.16 260);
-  --chart-4: oklch(0.55 0.14 250);
-  --chart-5: oklch(0.5 0.12 240);
+  
+  /* Chart Colors (brand gradient) */
+  --chart-1: oklch(0.71 0.15 231);           /* Cyan */
+  --chart-2: oklch(0.57 0.16 255);           /* Blue */
+  --chart-3: oklch(0.58 0.18 290);           /* Purple */
+  --chart-4: oklch(0.55 0.14 250);           /* Indigo */
+  --chart-5: oklch(0.5 0.12 240);            /* Deep Blue */
+  
+  /* Radius */
   --radius: 0.65rem;
-  --background: oklch(0.08 0.01 280);
-  --foreground: oklch(0.95 0.01 280);
-  --card: oklch(0.12 0.01 280);
+  
+  /* Dark Theme - Background & Surface */
+  --background: oklch(0.08 0.01 280);        /* #0F172A */
+  --foreground: oklch(0.95 0.01 280);        /* #F1F5F9 */
+  --card: oklch(0.12 0.01 280);              /* #1E293B */
   --card-foreground: oklch(0.95 0.01 280);
   --popover: oklch(0.12 0.01 280);
   --popover-foreground: oklch(0.95 0.01 280);
+  
+  /* Secondary & Muted */
   --secondary: oklch(0.2 0.05 280);
   --secondary-foreground: oklch(0.9 0.01 280);
   --muted: oklch(0.25 0.04 280);
   --muted-foreground: oklch(0.7 0.02 280);
-  --accent: oklch(0.7 0.2 280);
+  
+  /* Accent & Destructive */
+  --accent: oklch(0.71 0.15 231);            /* Cyan - brand accent */
   --accent-foreground: oklch(0.08 0.01 280);
-  --destructive: oklch(0.6 0.2 25);
+  --destructive: oklch(0.6 0.2 25);          /* Red */
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.2 0.05 280);
-  --input: oklch(0.15 0.03 280);
-  --ring: oklch(0.7 0.2 280);
+  
+  /* Border & Input */
+  --border: oklch(0.2 0.05 280);             /* #334155 */
+  --input: oklch(0.15 0.03 280);             /* #0F172A */
+  --ring: oklch(0.71 0.15 231);              /* Cyan - focus ring */
+  
+  /* Sidebar */
   --sidebar: oklch(0.12 0.01 280);
   --sidebar-foreground: oklch(0.95 0.01 280);
-  --sidebar-accent: oklch(0.7 0.2 280);
+  --sidebar-accent: oklch(0.71 0.15 231);
   --sidebar-accent-foreground: oklch(0.08 0.01 280);
   --sidebar-border: oklch(0.2 0.05 280);
-  --sidebar-ring: oklch(0.7 0.2 280);
+  --sidebar-ring: oklch(0.71 0.15 231);
 }
 
 .dark {
-  --primary: oklch(0.7 0.2 280);
-  --primary-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.65 0.18 275);
+  /* ========================================================================
+   * Pulse Protocol - Dark Theme (Official Brand Colors)
+   * ======================================================================== */
+  
+  /* Primary Brand Colors (from official logo) */
+  --primary: oklch(0.57 0.16 255);           /* Blue #2563EB */
+  --primary-foreground: oklch(1 0 0);        /* White */
+  --primary-light: oklch(0.71 0.15 231);     /* Cyan #0EA5E9 */
+  --primary-dark: oklch(0.58 0.18 290);      /* Purple #7C3AED */
+  
+  /* Sidebar Primary */
+  --sidebar-primary: oklch(0.57 0.16 255);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --background: oklch(0.08 0.01 280);
-  --foreground: oklch(0.95 0.01 280);
-  --card: oklch(0.12 0.01 280);
+  
+  /* Dark Theme - Background & Surface */
+  --background: oklch(0.08 0.01 280);        /* #0F172A */
+  --foreground: oklch(0.95 0.01 280);        /* #F1F5F9 */
+  --card: oklch(0.12 0.01 280);              /* #1E293B */
   --card-foreground: oklch(0.95 0.01 280);
   --popover: oklch(0.12 0.01 280);
   --popover-foreground: oklch(0.95 0.01 280);
+  
+  /* Secondary & Muted */
   --secondary: oklch(0.2 0.05 280);
   --secondary-foreground: oklch(0.9 0.01 280);
   --muted: oklch(0.25 0.04 280);
   --muted-foreground: oklch(0.7 0.02 280);
-  --accent: oklch(0.7 0.2 280);
+  
+  /* Accent & Destructive */
+  --accent: oklch(0.71 0.15 231);            /* Cyan - brand accent */
   --accent-foreground: oklch(0.08 0.01 280);
-  --destructive: oklch(0.6 0.2 25);
+  --destructive: oklch(0.6 0.2 25);          /* Red */
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.2 0.05 280);
-  --input: oklch(0.15 0.03 280);
-  --ring: oklch(0.7 0.2 280);
-  --chart-1: oklch(0.7 0.2 280);
-  --chart-2: oklch(0.65 0.18 270);
-  --chart-3: oklch(0.6 0.16 260);
-  --chart-4: oklch(0.55 0.14 250);
-  --chart-5: oklch(0.5 0.12 240);
+  
+  /* Border & Input */
+  --border: oklch(0.2 0.05 280);             /* #334155 */
+  --input: oklch(0.15 0.03 280);             /* #0F172A */
+  --ring: oklch(0.71 0.15 231);              /* Cyan - focus ring */
+  
+  /* Chart Colors (brand gradient) */
+  --chart-1: oklch(0.71 0.15 231);           /* Cyan */
+  --chart-2: oklch(0.57 0.16 255);           /* Blue */
+  --chart-3: oklch(0.58 0.18 290);           /* Purple */
+  --chart-4: oklch(0.55 0.14 250);           /* Indigo */
+  --chart-5: oklch(0.5 0.12 240);            /* Deep Blue */
+  
+  /* Sidebar */
   --sidebar: oklch(0.12 0.01 280);
   --sidebar-foreground: oklch(0.95 0.01 280);
-  --sidebar-accent: oklch(0.7 0.2 280);
+  --sidebar-accent: oklch(0.71 0.15 231);
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(0.2 0.05 280);
-  --sidebar-ring: oklch(0.7 0.2 280);
+  --sidebar-ring: oklch(0.71 0.15 231);
 }
 
 @layer base {
