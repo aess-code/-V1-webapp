@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { brand } from "@/config/brand";
 
 /**
  * Header Component
@@ -14,18 +15,28 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-purple-500/20">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <div
-          className="flex items-center gap-3 cursor-pointer"
+        {/* Logo - Brand Design System */}
+        <button
           onClick={() => navigate("/")}
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg"
+          aria-label="Pulse Protocol - Go to home page"
         >
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-            <span className="text-white font-bold">P</span>
-          </div>
-          <span className="text-xl font-bold text-foreground">Pulse</span>
-        </div>
+          {/* Official Logo Image */}
+          <img
+            src={brand.logo}
+            alt={brand.name}
+            width={40}
+            height={40}
+            className="w-10 h-10"
+            style={{ aspectRatio: "1 / 1" }}
+          />
+          {/* Brand Name - Desktop Only */}
+          <span className="hidden sm:inline text-lg font-semibold text-foreground">
+            {brand.name}
+          </span>
+        </button>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
@@ -53,12 +64,11 @@ export default function Header() {
           <div className="flex gap-4">
             <Button
               variant="outline"
-              className="border-purple-500/50 text-foreground"
               onClick={() => navigate("/app")}
             >
               Enter App
             </Button>
-            <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
+            <Button className="bg-gradient-to-r from-primary-light to-primary-dark hover:opacity-90 text-white">
               Docs
             </Button>
           </div>
@@ -81,7 +91,7 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-purple-500/20 bg-background p-4 space-y-4">
+        <div className="md:hidden border-t border-border bg-background p-4 space-y-4">
           <a
             href="#overview"
             className="block text-foreground/70 hover:text-foreground transition-colors"
@@ -103,7 +113,7 @@ export default function Header() {
           <div className="flex flex-col gap-3 pt-4">
             <Button
               variant="outline"
-              className="w-full border-purple-500/50 text-foreground"
+              className="w-full"
               onClick={() => {
                 navigate("/app");
                 setMobileMenuOpen(false);
@@ -111,7 +121,7 @@ export default function Header() {
             >
               Enter App
             </Button>
-            <Button className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
+            <Button className="w-full bg-gradient-to-r from-primary-light to-primary-dark hover:opacity-90 text-white">
               Docs
             </Button>
           </div>

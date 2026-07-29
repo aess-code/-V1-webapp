@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import { brand } from "@/config/brand";
 
 /**
  * Hero Section - Minimalist Protocol Aesthetic
@@ -38,14 +39,15 @@ export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
       {/* Dynamic Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-background to-blue-900/20" />
+      <div className="absolute inset-0" style={{ background: brand.gradients.subtle }} />
 
       {/* Animated Particles */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-purple-400/20 rounded-full"
+            className="absolute w-1 h-1 rounded-full"
+            style={{ backgroundColor: `${brand.colors.primaryLight}33` }}
             initial={{
               x: Math.random() * 100 + "%",
               y: Math.random() * 100 + "%",
@@ -72,11 +74,12 @@ export default function Hero() {
       >
         {/* Logo */}
         <motion.div variants={itemVariants} className="mb-8">
-          <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/50">
+          <div className="w-24 h-24 mx-auto rounded-full flex items-center justify-center shadow-lg" style={{ background: brand.gradients.primary, boxShadow: `0 0 30px ${brand.colors.primaryLight}80` }}>
             <img
-              src="/manus-storage/pulse-logo_f0ddc160.png"
-              alt="Pulse Logo"
+              src={brand.logo}
+              alt={brand.name}
               className="w-20 h-20"
+              style={{ aspectRatio: "1 / 1" }}
             />
           </div>
         </motion.div>
@@ -84,9 +87,10 @@ export default function Hero() {
         {/* Brand Name */}
         <motion.h1
           variants={itemVariants}
-          className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-300 via-blue-300 to-purple-300 bg-clip-text text-transparent"
+          className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent"
+          style={{ backgroundImage: brand.gradients.primary }}
         >
-          Pulse
+          {brand.name}
         </motion.h1>
 
         {/* Tagline */}
@@ -94,7 +98,7 @@ export default function Hero() {
           variants={itemVariants}
           className="text-xl md:text-2xl font-light text-foreground/80 mb-12 tracking-widest"
         >
-          VIEW. ANALYZE. STAKE. BELIEVE.
+          {brand.slogan}
         </motion.p>
 
         {/* Description */}
@@ -113,7 +117,7 @@ export default function Hero() {
         >
           <Button
             size="lg"
-            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-8 py-6 text-lg font-semibold rounded-lg shadow-lg shadow-purple-500/50 transition-all hover:shadow-xl hover:shadow-purple-500/70"
+            className="bg-gradient-to-r from-primary-light to-primary-dark hover:opacity-90 text-white px-8 py-6 text-lg font-semibold rounded-lg shadow-lg transition-all hover:shadow-xl"
             onClick={() => navigate("/app")}
           >
             Enter App
@@ -122,7 +126,7 @@ export default function Hero() {
           <Button
             size="lg"
             variant="outline"
-            className="border-purple-500/50 text-foreground hover:bg-purple-500/10 px-8 py-6 text-lg font-semibold rounded-lg"
+            className="text-foreground px-8 py-6 text-lg font-semibold rounded-lg"
           >
             Documentation
           </Button>
