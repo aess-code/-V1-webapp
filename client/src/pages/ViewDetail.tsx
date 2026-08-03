@@ -304,6 +304,7 @@ export default function ViewDetailPage() {
   const [, navigate] = useLocation();
   const viewId = id ? BigInt(id) : undefined;
   const { data: viewData, isLoading, error } = useViewData(viewId);
+  const [copied, setCopied] = useState(false);
 
   if (isLoading) {
     return (
@@ -337,7 +338,6 @@ export default function ViewDetailPage() {
   const title = metadata?.title || `View #${record.viewId.toString()}`;
   const description = metadata?.description || record.metadataURI;
   const isActive = state.status === MarketStatus.ACTIVE;
-  const [copied, setCopied] = useState(false);
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(`Check out this View on Pulse Protocol: ${title}`)}&url=${encodeURIComponent(shareUrl)}`;
   const handleCopy = () => {
