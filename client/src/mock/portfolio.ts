@@ -75,7 +75,7 @@ export const mockPortfolioPositions: PortfolioPosition[] = [
 export const mockPortfolioActivity: PortfolioActivity[] = [
   {
     id: "1",
-    type: "buy",
+    type: "support",
     viewTitle: "Bitcoin Price Surge",
     amount: 150,
     price: 0.65,
@@ -84,7 +84,7 @@ export const mockPortfolioActivity: PortfolioActivity[] = [
   },
   {
     id: "2",
-    type: "sell",
+    type: "exit",
     viewTitle: "Layer 2 Adoption",
     amount: 50,
     price: 0.68,
@@ -102,7 +102,7 @@ export const mockPortfolioActivity: PortfolioActivity[] = [
   },
   {
     id: "4",
-    type: "buy",
+    type: "support",
     viewTitle: "DeFi TVL Recovery",
     amount: 100,
     price: 0.62,
@@ -111,7 +111,7 @@ export const mockPortfolioActivity: PortfolioActivity[] = [
   },
   {
     id: "5",
-    type: "buy",
+    type: "support",
     viewTitle: "AI Market Growth",
     amount: 80,
     price: 0.62,

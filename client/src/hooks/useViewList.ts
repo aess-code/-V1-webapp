@@ -138,3 +138,9 @@ export function useActiveViews(maxViews = 50) {
   const activeViews = views.filter(v => v.state.status === MarketStatus.ACTIVE);
   return { views: activeViews, isLoading, error, total };
 }
+
+// Alias for convenience
+export function useViewList(maxViews = 50) {
+  return useAllViews(maxViews);
+}
+

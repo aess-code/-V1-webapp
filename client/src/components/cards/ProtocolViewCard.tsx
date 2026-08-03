@@ -1,4 +1,10 @@
 import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { MarketStatus, formatUSDT, pulseIndexToPrices } from "@/config/contracts";
+import type { ViewData } from "@/types/protocol";
+import { Clock, CheckCircle, Lock, TrendingUp, Share2, Copy, Check } from "lucide-react";
+import { useLocation } from "wouter";
 /**
  * ProtocolViewCard
  *
@@ -6,13 +12,6 @@ import { useState } from "react";
  * Replaces the mock-based ViewCard for DApp pages.
  */
 
-import { Share2, Copy, Check, Card } from "@/components/ui/card";
-import { Share2, Copy, Check, Badge } from "@/components/ui/badge";
-import { Share2, Copy, Check, MarketStatus, formatUSDT } from "@/config/contracts";
-import type { ViewData } from "@/types/protocol";
-import { Share2, Copy, Check, Clock, CheckCircle, Lock, TrendingUp } from "lucide-react";
-import { Share2, Copy, Check } from "lucide-react";
-import { Share2, Copy, Check, useLocation } from "wouter";
 
 interface ProtocolViewCardProps {
   viewData: ViewData;

@@ -97,7 +97,7 @@ function PriceDisplay({ yesPrice, noPrice, pulseIndex }: { yesPrice: number; noP
 
 function TradePanel({ viewId, isActive }: { viewId: bigint; isActive: boolean }) {
   const { isConnected } = useAccount();
-  const [tradeTab, setTradeTab] = useState<"support" | "exit">("buy");
+  const [tradeTab, setTradeTab] = useState<"support" | "exit">("support");
   const [side, setSide] = useState<0 | 1>(0);
   const [amount, setAmount] = useState("");
   const [shares, setShares] = useState("");

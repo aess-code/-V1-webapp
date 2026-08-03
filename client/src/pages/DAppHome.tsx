@@ -37,8 +37,8 @@ function ProtocolStats() {
   const { data: totalViews, isLoading } = useTotalViews();
   const { views, isLoading: viewsLoading } = useViewList();
 
-  const activeCount = views.filter(v => v.state.status === MarketStatus.ACTIVE).length;
-  const totalLiquidity = views.reduce((sum, v) => sum + (v.vaultBalance || 0n), 0n);
+  const activeCount = views.filter((v: any) => v.state.status === MarketStatus.ACTIVE).length;
+  const totalLiquidity = views.reduce((sum: bigint, v: any) => sum + (v.vaultBalance || 0n), 0n);
 
   if (isLoading || viewsLoading) {
     return (
@@ -79,7 +79,7 @@ export default function DAppHomePage() {
 
   // Show latest 3 active views
   const recentViews = views
-    .filter(v => v.state.status === MarketStatus.ACTIVE)
+    .filter((v: any) => v.state.status === MarketStatus.ACTIVE)
     .slice(0, 3);
 
   return (
@@ -161,7 +161,7 @@ export default function DAppHomePage() {
           </div>
         ) : recentViews.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {recentViews.map(v => (
+            {recentViews.map((v: any) => (
               <ProtocolViewCard key={v.record.viewId.toString()} viewData={v} />
             ))}
           </div>
