@@ -1,130 +1,109 @@
 import { motion } from "framer-motion";
-import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
+import { ArrowRight, CheckCircle, Clock, Circle } from "lucide-react";
 
 /**
- * Roadmap Section
- *
- * Shows protocol versions: V1, V2, V3 and beyond
+ * Roadmap Section — Compact timeline on Landing Page.
+ * Full roadmap available at /roadmap.
  */
-
-const roadmapItems = [
+const milestones = [
   {
-    version: "V1",
-    title: "Foundation",
-    status: "Current",
-    features: [
-      "Core protocol launch",
-      "Basic market creation",
-      "AMM trading",
-      "Viewstake DApp",
-    ],
-    color: "from-purple-500 to-blue-500",
+    quarter: "2026 Q4",
+    title: "Public Launch & Ecosystem Foundation",
+    summary: "Mainnet launch, SDK release, developer ecosystem, Pulse Pioneer Program.",
+    status: "current",
   },
   {
-    version: "V2",
-    title: "Enhancement",
-    status: "Planned",
-    features: [
-      "Advanced market types",
-      "Cross-chain support",
-      "Enhanced UX",
-      "Developer tools",
-    ],
-    color: "from-blue-500 to-cyan-500",
+    quarter: "2027 Q1",
+    title: "Base Ecosystem Expansion",
+    summary: "Deploy on Base, expanded API, DAO collaborations, third-party frontends.",
+    status: "planned",
   },
   {
-    version: "V3",
-    title: "Ecosystem",
-    status: "Future",
-    features: [
-      "Composable markets",
-      "Third-party integrations",
-      "Advanced analytics",
-      "DAO governance",
-    ],
-    color: "from-cyan-500 to-teal-500",
+    quarter: "2027 Q2",
+    title: "Sustainable Protocol Economy",
+    summary: "Governance framework, builder grants, institutional partnerships.",
+    status: "planned",
+  },
+  {
+    quarter: "2027 Q3+",
+    title: "Multi-chain Expansion",
+    summary: "Arbitrum, Ethereum mainnet, unified identity, cross-chain analytics.",
+    status: "future",
   },
 ];
 
-export default function Roadmap() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
+const statusConfig = {
+  current: { icon: CheckCircle, color: "text-green-400", bg: "bg-green-400", label: "Current" },
+  planned: { icon: Clock, color: "text-blue-400", bg: "bg-blue-400", label: "Planned" },
+  future:  { icon: Circle, color: "text-muted-foreground", bg: "bg-muted-foreground", label: "Future" },
+};
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
+export default function Roadmap() {
+  const [, navigate] = useLocation();
 
   return (
     <section className="py-20 px-4 bg-background relative overflow-hidden">
-      {/* Background gradient accent */}
       <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-gradient-to-b from-purple-500/10 to-blue-500/10 rounded-full blur-3xl" />
-
-      <div className="max-w-6xl mx-auto relative z-10">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-        >
-          {/* Section Title */}
-          <motion.div variants={itemVariants} className="text-center mb-16">
+      <div className="max-w-4xl mx-auto relative z-10">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+          <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
               Roadmap
             </h2>
-            <p className="text-lg text-foreground/60 max-w-2xl mx-auto">
-              The future of Pulse Protocol
-            </p>
-          </motion.div>
+            <p className="text-lg text-foreground/60">Building the infrastructure for decentralized opinion markets</p>
+          </div>
 
-          {/* Roadmap Timeline */}
-          <div className="grid md:grid-cols-3 gap-8">
-            {roadmapItems.map((item, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                whileHover={{ y: -8 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Card className="h-full p-8 bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-purple-500/20 hover:border-purple-500/50 transition-all duration-300">
-                  {/* Version Badge */}
-                  <div
-                    className={`inline-block px-4 py-2 rounded-full bg-gradient-to-r ${item.color} text-white text-sm font-semibold mb-4`}
+          {/* Timeline */}
+          <div className="relative">
+            {/* Vertical line */}
+            <div className="absolute left-6 top-0 bottom-0 w-px bg-border hidden sm:block" />
+
+            <div className="space-y-6">
+              {milestones.map((item, index) => {
+                const cfg = statusConfig[item.status as keyof typeof statusConfig];
+                const Icon = cfg.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="flex gap-6 items-start"
                   >
-                    {item.version}
-                  </div>
-
-                  {/* Status */}
-                  <div className="mb-4">
-                    <h3 className="text-2xl font-bold text-foreground mb-2">
-                      {item.title}
-                    </h3>
-                    <p className="text-sm text-foreground/60">{item.status}</p>
-                  </div>
-
-                  {/* Features List */}
-                  <div className="space-y-3">
-                    {item.features.map((feature, fIndex) => (
-                      <div key={fIndex} className="flex items-start gap-3">
-                        <div className="w-2 h-2 rounded-full bg-purple-400 mt-2 flex-shrink-0" />
-                        <p className="text-foreground/70">{feature}</p>
+                    {/* Icon */}
+                    <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center flex-shrink-0 z-10 bg-background ${item.status === 'current' ? 'border-green-400' : item.status === 'planned' ? 'border-blue-400' : 'border-border'}`}>
+                      <Icon className={`w-5 h-5 ${cfg.color}`} />
+                    </div>
+                    {/* Content */}
+                    <div className={`flex-1 rounded-xl p-5 border transition-all ${item.status === 'current' ? 'bg-green-500/5 border-green-500/20' : item.status === 'planned' ? 'bg-blue-500/5 border-blue-500/20' : 'bg-card border-border'}`}>
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className="text-xs font-mono text-muted-foreground">{item.quarter}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${item.status === 'current' ? 'bg-green-500/20 text-green-400' : item.status === 'planned' ? 'bg-blue-500/20 text-blue-400' : 'bg-muted text-muted-foreground'}`}>
+                          {cfg.label}
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
+                      <h3 className="font-semibold text-foreground mb-1">{item.title}</h3>
+                      <p className="text-sm text-foreground/60">{item.summary}</p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-10">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => navigate("/roadmap")}
+            >
+              View Full Roadmap
+              <ArrowRight className="w-4 h-4" />
+            </Button>
           </div>
         </motion.div>
       </div>

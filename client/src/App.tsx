@@ -28,6 +28,7 @@ import DiscoverPage from "./pages/Discover";
 import ViewDetailPage from "./pages/ViewDetail";
 import CreateViewPage from "./pages/CreateView";
 import DAppHomePage from "./pages/DAppHome";
+import RoadmapPage from "./pages/RoadmapPage";
 
 // Lazy placeholder pages (not yet implemented)
 const Portfolio = () => (
@@ -57,6 +58,9 @@ function Router() {
       <Route path="/app/view/:id" component={ViewDetailPage} />
       <Route path="/app/create" component={CreateViewPage} />
       <Route path="/app/portfolio" component={Portfolio} />
+
+      {/* Roadmap */}
+      <Route path="/roadmap" component={RoadmapPage} />
 
       {/* Fallback */}
       <Route path="/404" component={NotFound} />
