@@ -23,7 +23,7 @@ export const brand = {
   slogan: 'VIEW. ANALYZE. STAKE. BELIEVE.',
   
   /** Brand tagline */
-  tagline: 'A decentralized protocol for permissionless market creation and prediction.',
+  tagline: 'A decentralized protocol for permissionless opinion market creation.',
   
   // ============================================================================
   // Logo & Assets
@@ -107,11 +107,13 @@ export const brand = {
   // ============================================================================
   
   links: {
-    github: 'https://github.com/aess-code/-V1-webapp',
-    documentation: 'https://docs.pulse.protocol', // Reserved
-    x: 'https://x.com/pulse_protocol',            // Reserved
-    telegram: 'https://t.me/pulse_protocol',      // Reserved
-    discord: 'https://discord.gg/pulse',          // Reserved
+    github:           'https://github.com/aess-code/pulse-protocol-v1',
+    githubFrontend:   'https://github.com/aess-code/-V1-webapp',
+    docsIndex:        'https://github.com/aess-code/pulse-protocol-v1/tree/main/docs',
+    docsApi:          'https://github.com/aess-code/pulse-protocol-v1/blob/main/docs/PULSE_V1_DEVELOPER_API_REFERENCE.md',
+    docsConstitution: 'https://github.com/aess-code/pulse-protocol-v1/blob/main/docs/Protocol_Constitution.md',
+    x:                'https://x.com/buildonpulse?s=11',
+    telegram:         'https://t.me/PulseProtocol_first',
   },
   
   // ============================================================================
@@ -120,10 +122,10 @@ export const brand = {
   
   seo: {
     /** Page title */
-    title: 'Pulse Protocol - Decentralized Prediction Markets',
+    title: 'Pulse Protocol - Decentralized Opinion Markets',
     
     /** Meta description */
-    description: 'A decentralized protocol for permissionless market creation and prediction. View, analyze, stake, and believe in any outcome.',
+    description: 'A decentralized protocol for permissionless opinion market creation. View, analyze, stake, and believe in any outcome.',
     
     /** Canonical URL */
     canonical: 'https://pulse.protocol',

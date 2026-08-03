@@ -106,8 +106,8 @@ export default function Hero() {
           variants={itemVariants}
           className="text-lg text-foreground/60 mb-12 max-w-2xl mx-auto leading-relaxed"
         >
-          A decentralized protocol for permissionless market creation and
-          prediction. Build, trade, and stake on any outcome.
+          A decentralized protocol for permissionless opinion market creation.
+          Express your view, take a position, and participate in collective intelligence.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -121,22 +121,6 @@ export default function Hero() {
             onClick={() => navigate("/app")}
           >
             Enter App
-          </Button>
-
-          <Button
-            size="lg"
-            variant="outline"
-            className="text-foreground px-8 py-6 text-lg font-semibold rounded-lg"
-          >
-            Documentation
-          </Button>
-
-          <Button
-            size="lg"
-            variant="ghost"
-            className="text-foreground/70 hover:text-foreground px-8 py-6 text-lg font-semibold"
-          >
-            GitHub
           </Button>
         </motion.div>
 
