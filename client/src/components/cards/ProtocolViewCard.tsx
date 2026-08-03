@@ -1,3 +1,4 @@
+import { useState } from "react";
 /**
  * ProtocolViewCard
  *
@@ -5,12 +6,13 @@
  * Replaces the mock-based ViewCard for DApp pages.
  */
 
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { MarketStatus, formatUSDT } from "@/config/contracts";
+import { Share2, Copy, Check, Card } from "@/components/ui/card";
+import { Share2, Copy, Check, Badge } from "@/components/ui/badge";
+import { Share2, Copy, Check, MarketStatus, formatUSDT } from "@/config/contracts";
 import type { ViewData } from "@/types/protocol";
-import { Clock, CheckCircle, Lock, TrendingUp } from "lucide-react";
-import { useLocation } from "wouter";
+import { Share2, Copy, Check, Clock, CheckCircle, Lock, TrendingUp } from "lucide-react";
+import { Share2, Copy, Check } from "lucide-react";
+import { Share2, Copy, Check, useLocation } from "wouter";
 
 interface ProtocolViewCardProps {
   viewData: ViewData;
@@ -88,6 +90,34 @@ function PriceBar({ yesPrice, noPrice }: { yesPrice: number; noPrice: number }) 
         </div>
       </div>
     </div>
+  );
+}
+
+
+function ShareButton({ viewId, title }: { viewId: string; title: string }) {
+  const [copied, setCopied] = useState(false);
+  const url = typeof window !== "undefined" ? `${window.location.origin}/app/view/${viewId}` : "";
+  const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(`Check out this View on Pulse Protocol: ${title}`)}&url=${encodeURIComponent(url)}`;
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+  return (
+    <>
+      <button onClick={handleCopy}
+        className="flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+        {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+        {copied ? "Copied" : "Copy"}
+      </button>
+      <a href={xUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+        className="flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+        <Share2 className="w-3 h-3" />
+        Share
+      </a>
+    </>
   );
 }
 
@@ -173,6 +203,10 @@ export function ProtocolViewCard({ viewData, onClick }: ProtocolViewCardProps) {
             {state.lastPulseIndex.toString()}
           </p>
         </div>
+      </div>
+      {/* Share */}
+      <div className="mt-3 pt-3 border-t border-border flex gap-2" onClick={e => e.stopPropagation()}>
+        <ShareButton viewId={record.viewId.toString()} title={title} />
       </div>
     </Card>
   );

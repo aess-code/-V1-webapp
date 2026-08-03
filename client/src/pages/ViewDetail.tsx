@@ -42,6 +42,9 @@ import {
   Clock,
   ExternalLink,
   AlertCircle,
+  Share2,
+  Copy,
+  Check,
 } from "lucide-react";
 
 function StatusBadge({ status }: { status: MarketStatus }) {
@@ -229,31 +232,68 @@ function PositionPanel({ viewId, status }: { viewId: bigint; status: MarketStatu
   );
 }
 
-function MarketStatePanel({ viewId, status }: { viewId: bigint; status: MarketStatus }) {
-  const { lockMarket, isPending: locking } = useLockMarket();
-  const { settleMarket, isPending: settling } = useSettleMarket();
+function MarketStatePanel({ viewId, status, endTime, viewType }: {
+  viewId: bigint;
+  status: MarketStatus;
+  endTime: Date | null;
+  viewType: number;
+}) {
+  const { lockMarket, isPending: locking, error: lockError } = useLockMarket();
+  const { settleMarket, isPending: settling, error: settleError } = useSettleMarket();
+  const now = new Date();
+  const endTimeReached = endTime !== null && endTime <= now;
+  const isPermanent = viewType === 1;
+
   return (
     <div className="bg-card border border-border rounded-xl p-5">
       <h3 className="text-sm font-medium mb-4">Market Actions</h3>
       <div className="space-y-2">
-        {status === MarketStatus.ACTIVE && (
-          <div>
-            <p className="text-xs text-muted-foreground mb-2">Anyone can lock the market after end time.</p>
-            <Button variant="outline" size="sm" className="w-full" onClick={() => lockMarket(viewId)} disabled={locking}>
-              {locking ? "Locking..." : "Lock Market"}
-            </Button>
+        {isPermanent && (
+          <p className="text-xs text-muted-foreground">This is a Permanent View — it has no end time and cannot be locked.</p>
+        )}
+        {!isPermanent && status === MarketStatus.ACTIVE && (
+          <div className="space-y-2">
+            {endTimeReached ? (
+              <>
+                <p className="text-xs text-muted-foreground">End time reached. Anyone can now lock this market.</p>
+                <Button variant="outline" size="sm" className="w-full" onClick={() => lockMarket(viewId)} disabled={locking}>
+                  {locking ? "Locking..." : "Lock Market"}
+                </Button>
+              </>
+            ) : (
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="text-xs text-muted-foreground">
+                  Market can be locked after end time.
+                </p>
+                {endTime && (
+                  <p className="text-xs text-foreground/60 mt-1 font-mono">
+                    Ends: {endTime.toLocaleString()}
+                  </p>
+                )}
+              </div>
+            )}
+            {lockError && (
+              <p className="text-xs text-red-400 break-all">Error: {(lockError as Error).message?.slice(0, 80)}</p>
+            )}
           </div>
         )}
         {status === MarketStatus.LOCKED && (
-          <div>
-            <p className="text-xs text-muted-foreground mb-2">Market is locked. Settlement can now be triggered.</p>
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">Market is locked. Settlement can now be triggered.</p>
             <Button variant="outline" size="sm" className="w-full" onClick={() => settleMarket(viewId)} disabled={settling}>
               {settling ? "Settling..." : "Trigger Settlement"}
             </Button>
+            {settleError && (
+              <p className="text-xs text-red-400 break-all">Error: {(settleError as Error).message?.slice(0, 80)}</p>
+            )}
           </div>
         )}
-        {status === MarketStatus.SETTLEMENT && <p className="text-xs text-muted-foreground">Settlement in progress...</p>}
-        {status === MarketStatus.CLAIMABLE && <p className="text-xs text-green-400">Settlement complete. Claims are open.</p>}
+        {status === MarketStatus.SETTLEMENT && (
+          <p className="text-xs text-muted-foreground">Settlement in progress...</p>
+        )}
+        {status === MarketStatus.CLAIMABLE && (
+          <p className="text-xs text-green-400">Settlement complete. Claims are open.</p>
+        )}
       </div>
     </div>
   );
@@ -297,6 +337,15 @@ export default function ViewDetailPage() {
   const title = metadata?.title || `View #${record.viewId.toString()}`;
   const description = metadata?.description || record.metadataURI;
   const isActive = state.status === MarketStatus.ACTIVE;
+  const [copied, setCopied] = useState(false);
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(`Check out this View on Pulse Protocol: ${title}`)}&url=${encodeURIComponent(shareUrl)}`;
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
   const endTime = record.endTime > 0n ? new Date(Number(record.endTime) * 1000) : null;
   const startTime = record.startTime > 0n ? new Date(Number(record.startTime) * 1000) : null;
 
@@ -316,6 +365,19 @@ export default function ViewDetailPage() {
             <h1 className="text-2xl font-bold text-foreground">{title}</h1>
             <p className="text-muted-foreground mt-2 text-sm">{description}</p>
           </div>
+          {/* Share buttons */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button onClick={handleCopy}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-colors text-xs text-muted-foreground hover:text-foreground">
+              {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? "Copied!" : "Copy Link"}
+            </button>
+            <a href={xShareUrl} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-colors text-xs text-muted-foreground hover:text-foreground">
+              <Share2 className="w-3.5 h-3.5" />
+              Share
+            </a>
+          </div>
         </div>
         <div className="flex flex-wrap gap-4 mt-4 text-xs text-muted-foreground">
           <span>Fee Recipient: <a href={`https://sepolia.etherscan.io/address/${record.feeRecipient}`} target="_blank" rel="noopener noreferrer" className="font-mono text-primary hover:underline inline-flex items-center gap-1">{record.feeRecipient.slice(0, 8)}...{record.feeRecipient.slice(-6)}<ExternalLink className="w-3 h-3" /></a></span>
@@ -333,8 +395,8 @@ export default function ViewDetailPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div><p className="text-xs text-muted-foreground">Total Liquidity</p><p className="text-lg font-bold">{formatUSDT(vaultBalance)}</p></div>
               <div><p className="text-xs text-muted-foreground">Reserve Balance</p><p className="text-lg font-bold">{formatUSDT(state.reserveBalance)}</p></div>
-              <div><p className="text-xs text-muted-foreground">YES Supply</p><p className="text-lg font-bold text-green-400 font-mono">{state.forSupply.toString()}</p></div>
-              <div><p className="text-xs text-muted-foreground">NO Supply</p><p className="text-lg font-bold text-red-400 font-mono">{state.againstSupply.toString()}</p></div>
+              <div><p className="text-xs text-muted-foreground">FOR Supply</p><p className="text-lg font-bold text-green-400 font-mono">{state.forSupply.toString()}</p></div>
+              <div><p className="text-xs text-muted-foreground">AGAINST Supply</p><p className="text-lg font-bold text-red-400 font-mono">{state.againstSupply.toString()}</p></div>
               <div><p className="text-xs text-muted-foreground">Total Fee</p><p className="text-lg font-bold">1%</p></div>
               <div><p className="text-xs text-muted-foreground">View Type</p><p className="text-lg font-bold">{record.viewType === 0 ? "Fixed" : "Permanent"}</p></div>
             </div>
@@ -360,7 +422,7 @@ export default function ViewDetailPage() {
         <div className="space-y-4">
           <TradePanel viewId={record.viewId} isActive={isActive} />
           <PositionPanel viewId={record.viewId} status={state.status} />
-          <MarketStatePanel viewId={record.viewId} status={state.status} />
+          <MarketStatePanel viewId={record.viewId} status={state.status} endTime={endTime} viewType={record.viewType} />
         </div>
       </div>
     </DAppLayout>
