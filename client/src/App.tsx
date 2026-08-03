@@ -29,13 +29,9 @@ import ViewDetailPage from "./pages/ViewDetail";
 import CreateViewPage from "./pages/CreateView";
 import DAppHomePage from "./pages/DAppHome";
 import RoadmapPage from "./pages/RoadmapPage";
+import PortfolioPage from "./pages/Portfolio";
 
-// Lazy placeholder pages (not yet implemented)
-const Portfolio = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
-    <p className="text-muted-foreground">Portfolio — Coming Soon</p>
-  </div>
-);
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,7 +53,7 @@ function Router() {
       <Route path="/app/explore" component={DiscoverPage} />
       <Route path="/app/view/:id" component={ViewDetailPage} />
       <Route path="/app/create" component={CreateViewPage} />
-      <Route path="/app/portfolio" component={Portfolio} />
+      <Route path="/app/portfolio" component={PortfolioPage} />
 
       {/* Roadmap */}
       <Route path="/roadmap" component={RoadmapPage} />
