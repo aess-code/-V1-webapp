@@ -1,366 +1,368 @@
 /**
- * View Detail Page
- *
- * 信息层级：
- * 1. View + Price + Stake（最重要）
- * 2. Chart + Volume + Protocol Metrics
- * 3. Activity Feed
- * 4. Description
- * 5. Discussion（未来）
+ * View Detail Page — Protocol-aligned (Pulse V1 be73488)
+ * Data: TradingEngine + PulseFactory via wagmi/viem
  */
-
-import { useParams } from "wouter";
 import { useState } from "react";
-import { DetailLayout } from "@/layouts";
+import { useParams, useLocation } from "wouter";
+import { useAccount } from "wagmi";
+import { sepolia } from "wagmi/chains";
+import { DAppLayout } from "@/layouts/DAppLayout";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { MetricCard } from "@/components/cards/MetricCard";
-import { ActivityItem } from "@/components/common/ActivityItem";
-import { LoadingState, EmptyState, ErrorState } from "@/components/states";
-import { TrendingUp, Share2, Bookmark } from "lucide-react";
-import { mockViews } from "@/mock/views";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  useViewData,
+  usePosition,
+  useUSDTBalance,
+  useUSDTAllowance,
+  useClaimableAmount,
+  useHasClaimed,
+} from "@/hooks/useProtocol";
+import {
+  useBuy,
+  useSell,
+  useApproveUSDT,
+  useClaimReward,
+  useLockMarket,
+  useSettleMarket,
+} from "@/hooks/useProtocolWrite";
+import {
+  MarketStatus,
+  formatUSDT,
+  parseUSDT,
+  CONTRACT_ADDRESSES,
+} from "@/config/contracts";
+import {
+  ArrowLeft,
+  TrendingUp,
+  Lock,
+  CheckCircle,
+  Clock,
+  ExternalLink,
+  AlertCircle,
+} from "lucide-react";
 
-export default function ViewDetailPage() {
-  const { id } = useParams<{ id: string }>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+function StatusBadge({ status }: { status: MarketStatus }) {
+  const configs = {
+    [MarketStatus.ACTIVE]: { label: "Active", icon: TrendingUp, cls: "bg-green-500/20 text-green-400 border-green-500/30" },
+    [MarketStatus.LOCKED]: { label: "Locked", icon: Lock, cls: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
+    [MarketStatus.SETTLEMENT]: { label: "Settlement", icon: Clock, cls: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
+    [MarketStatus.CLAIMABLE]: { label: "Claimable", icon: CheckCircle, cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+  };
+  const cfg = configs[status];
+  const Icon = cfg.icon;
+  return (
+    <Badge className={`${cfg.cls} text-xs`}>
+      <Icon className="w-3 h-3 mr-1" />
+      {cfg.label}
+    </Badge>
+  );
+}
 
-  // Mock: 获取 View 详情
-  const view = mockViews.find(v => v.id === id);
+function PriceDisplay({ yesPrice, noPrice, pulseIndex }: { yesPrice: number; noPrice: number; pulseIndex: bigint }) {
+  return (
+    <div className="bg-card border border-border rounded-xl p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-muted-foreground">Current Prices</h3>
+        <span className="text-xs text-muted-foreground font-mono">Pulse Index: {pulseIndex.toString()}</span>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span className="text-sm text-muted-foreground">YES</span>
+            <span className="text-lg font-bold text-green-400">{(yesPrice * 100).toFixed(2)}¢</span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-3">
+            <div className="bg-green-500 h-3 rounded-full transition-all" style={{ width: `${yesPrice * 100}%` }} />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span className="text-sm text-muted-foreground">NO</span>
+            <span className="text-lg font-bold text-red-400">{(noPrice * 100).toFixed(2)}¢</span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-3">
+            <div className="bg-red-500 h-3 rounded-full transition-all" style={{ width: `${noPrice * 100}%` }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  if (isLoading) {
+function TradePanel({ viewId, isActive }: { viewId: bigint; isActive: boolean }) {
+  const { isConnected } = useAccount();
+  const [tradeTab, setTradeTab] = useState<"buy" | "sell">("buy");
+  const [side, setSide] = useState<0 | 1>(0);
+  const [amount, setAmount] = useState("");
+  const [shares, setShares] = useState("");
+  const { data: usdtBalance } = useUSDTBalance();
+  const { data: allowance } = useUSDTAllowance();
+  const { data: position } = usePosition(viewId);
+  const { approve, isPending: approving, isConfirming: approveConfirming, isSuccess: approved } = useApproveUSDT();
+  const { buy, isPending: buying, isConfirming: buyConfirming, isSuccess: bought } = useBuy();
+  const { sell, isPending: selling, isConfirming: sellConfirming, isSuccess: sold } = useSell();
+  const amountBigInt = amount ? parseUSDT(amount) : 0n;
+  const needsApproval = allowance !== undefined && (allowance as bigint) < amountBigInt && amountBigInt > 0n;
+  const pos = position as any;
+  const userForShares = pos?.forShares ?? 0n;
+  const userAgainstShares = pos?.againstShares ?? 0n;
+  const currentShares = side === 0 ? userForShares : userAgainstShares;
+
+  if (!isConnected) {
     return (
-      <DetailLayout>
-        <LoadingState type="skeleton" />
-      </DetailLayout>
+      <div className="bg-card border border-border rounded-xl p-5 text-center">
+        <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+        <p className="text-sm text-muted-foreground">Connect your wallet to trade</p>
+      </div>
     );
   }
-
-  if (error || !view) {
+  if (!isActive) {
     return (
-      <DetailLayout>
-        <ErrorState
-          title="View not found"
-          message="The view you're looking for doesn't exist or has been removed."
-        />
-      </DetailLayout>
+      <div className="bg-card border border-border rounded-xl p-5 text-center">
+        <Lock className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+        <p className="text-sm text-muted-foreground">Trading is closed for this market</p>
+      </div>
     );
   }
 
   return (
-    <DetailLayout>
-      <div className="space-y-8">
-        {/* 信息层级 1: View + Price + Stake */}
-        <section className="space-y-4">
-          {/* View Header */}
-          <div className="space-y-3">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h1 className="text-4xl font-bold mb-2">{view.title}</h1>
-                <p className="text-lg text-muted-foreground">
-                  {view.description}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="icon">
-                  <Share2 className="w-4 h-4" />
-                </Button>
-                <Button variant="outline" size="icon">
-                  <Bookmark className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Creator Info */}
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border">
-              <Avatar className="w-12 h-12">
-                <AvatarImage
-                  src={
-                    typeof view.creator === "string"
-                      ? undefined
-                      : view.creator.avatar
-                  }
-                />
-                <AvatarFallback>CR</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="font-semibold flex items-center gap-2">
-                  {typeof view.creator === "string"
-                    ? view.creator
-                    : view.creator.name}
-                  {typeof view.creator !== "string" &&
-                    view.creator.verified && (
-                      <Badge variant="secondary" className="text-xs">
-                        Verified
-                      </Badge>
-                    )}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {typeof view.creator === "string"
-                    ? view.creator
-                    : view.creator.address}
-                </p>
-              </div>
-            </div>
-
-            {/* Category & Dates */}
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <Badge variant="outline">{view.category}</Badge>
-              <span>
-                Created {new Date(view.createdAt).toLocaleDateString()}
-              </span>
-              <span>
-                Updated {new Date(view.updatedAt).toLocaleDateString()}
-              </span>
-            </div>
+    <div className="bg-card border border-border rounded-xl p-5">
+      <Tabs value={tradeTab} onValueChange={v => setTradeTab(v as "buy" | "sell")}>
+        <TabsList className="grid grid-cols-2 w-full mb-4">
+          <TabsTrigger value="buy">Buy</TabsTrigger>
+          <TabsTrigger value="sell">Sell</TabsTrigger>
+        </TabsList>
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          <button onClick={() => setSide(0)} className={`py-2 rounded-lg text-sm font-medium transition-colors border ${side === 0 ? "bg-green-500/20 text-green-400 border-green-500/40" : "bg-muted text-muted-foreground border-border"}`}>YES</button>
+          <button onClick={() => setSide(1)} className={`py-2 rounded-lg text-sm font-medium transition-colors border ${side === 1 ? "bg-red-500/20 text-red-400 border-red-500/40" : "bg-muted text-muted-foreground border-border"}`}>NO</button>
+        </div>
+        <TabsContent value="buy" className="space-y-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Amount (USDT)</label>
+            <Input type="number" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} className="font-mono" />
+            {usdtBalance !== undefined && <p className="text-xs text-muted-foreground mt-1">Balance: {formatUSDT(usdtBalance as bigint)}</p>}
           </div>
-
-          {/* Price Panel */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20">
-              <p className="text-xs text-muted-foreground mb-2">Long Price</p>
-              <p className="text-3xl font-bold text-green-500">
-                ${view.pool.longPrice.toFixed(2)}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                {(view.pool.longLiquidity / 1000000).toFixed(1)}M liquidity
-              </p>
-            </div>
-            <div className="p-4 rounded-lg bg-gradient-to-br from-red-500/10 to-red-500/5 border border-red-500/20">
-              <p className="text-xs text-muted-foreground mb-2">Short Price</p>
-              <p className="text-3xl font-bold text-red-500">
-                ${view.pool.shortPrice.toFixed(2)}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                {(view.pool.shortLiquidity / 1000000).toFixed(1)}M liquidity
-              </p>
-            </div>
+          {needsApproval ? (
+            <Button className="w-full" onClick={() => approve(amountBigInt)} disabled={approving || approveConfirming || !amount}>
+              {approving || approveConfirming ? "Approving..." : "Approve USDT"}
+            </Button>
+          ) : (
+            <Button className={`w-full ${side === 0 ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`} onClick={() => buy({ viewId, side, amountIn: amountBigInt, minSharesOut: 0n })} disabled={buying || buyConfirming || !amount || amountBigInt === 0n}>
+              {buying || buyConfirming ? "Confirming..." : `Buy ${side === 0 ? "YES" : "NO"}`}
+            </Button>
+          )}
+          {bought && <p className="text-xs text-green-400 text-center">Transaction confirmed!</p>}
+        </TabsContent>
+        <TabsContent value="sell" className="space-y-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Shares to sell</label>
+            <Input type="number" placeholder="0" value={shares} onChange={e => setShares(e.target.value)} className="font-mono" />
+            <p className="text-xs text-muted-foreground mt-1">Your {side === 0 ? "YES" : "NO"} shares: <span className="font-mono">{currentShares.toString()}</span></p>
           </div>
-
-          {/* Stake Button */}
-          <Button className="w-full h-12 text-lg" size="lg">
-            <TrendingUp className="w-5 h-5 mr-2" />
-            Stake Your Conviction
+          <Button className="w-full" variant="outline" onClick={() => sell({ viewId, side, sharesIn: shares ? BigInt(shares) : 0n, minAmountOut: 0n })} disabled={selling || sellConfirming || !shares}>
+            {selling || sellConfirming ? "Confirming..." : `Sell ${side === 0 ? "YES" : "NO"}`}
           </Button>
+          {sold && <p className="text-xs text-green-400 text-center">Transaction confirmed!</p>}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
 
-          {/* Quick Stats */}
-          <div className="p-4 rounded-lg bg-card border border-border space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">
-                Total Liquidity
-              </span>
-              <span className="font-semibold">
-                ${(view.metrics.tvl / 1000000).toFixed(1)}M
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">24h Volume</span>
-              <span className="font-semibold">
-                ${(view.metrics.volume24h / 1000000).toFixed(2)}M
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">
-                Participants
-              </span>
-              <span className="font-semibold">{view.metrics.participants}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">24h Change</span>
-              <span
-                className={`font-semibold ${
-                  view.metrics.change24h >= 0
-                    ? "text-green-500"
-                    : "text-red-500"
-                }`}
-              >
-                {view.metrics.change24h > 0 ? "+" : ""}
-                {view.metrics.change24h}%
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* 信息层级 2: Chart + Volume + Protocol Metrics */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold">Market Data</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <MetricCard
-              label="24h Change"
-              value={`${view.metrics.change24h}%`}
-              dataType="percentage"
-              change={view.metrics.change24h}
-              changeLabel="vs 7d"
-            />
-            <MetricCard
-              label="24h Volume"
-              value={`$${(view.metrics.volume24h / 1000000).toFixed(2)}M`}
-              dataType="currency"
-            />
-            <MetricCard
-              label="Total TVL"
-              value={`$${(view.metrics.tvl / 1000000).toFixed(1)}M`}
-              dataType="currency"
-            />
-            <MetricCard
-              label="Participants"
-              value={view.metrics.participants.toString()}
-              dataType="text"
-            />
-          </div>
-
-          {/* Chart Placeholder */}
-          <div className="p-8 rounded-lg bg-card border border-border flex items-center justify-center h-80">
-            <p className="text-muted-foreground">Price Chart (Coming Soon)</p>
-          </div>
-        </section>
-
-        {/* 信息层级 3: Activity Feed */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold">Recent Activity</h2>
-
-          <div className="space-y-3">
-            {[
-              {
-                id: "1",
-                type: "stake" as const,
-                actor: "0x1234...5678",
-                action: "Staked $1,234 on Long",
-                timestamp: new Date(Date.now() - 3600000).toISOString(),
-              },
-              {
-                id: "2",
-                type: "stake" as const,
-                actor: "0x2345...6789",
-                action: "Staked $567 on Short",
-                timestamp: new Date(Date.now() - 7200000).toISOString(),
-              },
-              {
-                id: "3",
-                type: "create" as const,
-                actor:
-                  typeof view.creator === "string"
-                    ? view.creator
-                    : view.creator.name,
-                action: "Created this view",
-                timestamp: view.createdAt,
-              },
-            ].map(activity => (
-              <ActivityItem
-                key={activity.id}
-                type={activity.type}
-                actor={activity.actor}
-                action={activity.action}
-                timestamp={activity.timestamp}
-              />
-            ))}
-          </div>
-        </section>
-
-        {/* 信息层级 4: Description */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold">About This View</h2>
-
-          <Tabs defaultValue="description" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="description">Description</TabsTrigger>
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="stats">Statistics</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="description" className="space-y-4">
-              <p className="text-muted-foreground leading-relaxed">
-                {view.description}
-              </p>
-            </TabsContent>
-
-            <TabsContent value="details" className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Total Staked
-                  </p>
-                  <p className="text-xl font-semibold">
-                    ${(view.stats.totalStaked / 1000000).toFixed(2)}M
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Average Stake
-                  </p>
-                  <p className="text-xl font-semibold">
-                    ${view.stats.averageStake.toLocaleString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Max Stake
-                  </p>
-                  <p className="text-xl font-semibold">
-                    ${view.stats.maxStake.toLocaleString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Trade Count
-                  </p>
-                  <p className="text-xl font-semibold">
-                    {view.stats.tradeCount.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="stats" className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 rounded-lg bg-card border border-border">
-                  <span className="text-sm text-muted-foreground">
-                    7d Change
-                  </span>
-                  <span
-                    className={`font-semibold ${
-                      (view.metrics.change7d || 0) >= 0
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {(view.metrics.change7d || 0) > 0 ? "+" : ""}
-                    {view.metrics.change7d || 0}%
-                  </span>
-                </div>
-                <div className="flex justify-between items-center p-3 rounded-lg bg-card border border-border">
-                  <span className="text-sm text-muted-foreground">
-                    30d Change
-                  </span>
-                  <span
-                    className={`font-semibold ${
-                      (view.metrics.change30d || 0) >= 0
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {(view.metrics.change30d || 0) > 0 ? "+" : ""}
-                    {view.metrics.change30d || 0}%
-                  </span>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </section>
-
-        {/* 信息层级 5: Discussion (Reserved) */}
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold">Discussion</h2>
-          <div className="p-8 rounded-lg bg-card border border-border flex items-center justify-center h-40">
-            <p className="text-muted-foreground">
-              Discussion feature coming soon
-            </p>
-          </div>
-        </section>
+function PositionPanel({ viewId, status }: { viewId: bigint; status: MarketStatus }) {
+  const { isConnected } = useAccount();
+  const { data: position } = usePosition(viewId);
+  const { data: claimable } = useClaimableAmount(viewId);
+  const { data: hasClaimed } = useHasClaimed(viewId);
+  const { claimReward, isPending, isConfirming, isSuccess } = useClaimReward();
+  if (!isConnected || !position) {
+    return (
+      <div className="bg-card border border-border rounded-xl p-5">
+        <h3 className="text-sm font-medium mb-3">Your Position</h3>
+        <p className="text-xs text-muted-foreground">{isConnected ? "No position in this market." : "Connect wallet to view position."}</p>
       </div>
-    </DetailLayout>
+    );
+  }
+  const pos = position as any;
+  const forShares = pos.forShares ?? 0n;
+  const againstShares = pos.againstShares ?? 0n;
+  const hasPosition = forShares > 0n || againstShares > 0n;
+  return (
+    <div className="bg-card border border-border rounded-xl p-5">
+      <h3 className="text-sm font-medium mb-4">Your Position</h3>
+      {!hasPosition ? (
+        <p className="text-xs text-muted-foreground">No position in this market.</p>
+      ) : (
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+              <p className="text-xs text-muted-foreground">YES Shares</p>
+              <p className="text-lg font-bold text-green-400 font-mono">{forShares.toString()}</p>
+            </div>
+            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+              <p className="text-xs text-muted-foreground">NO Shares</p>
+              <p className="text-lg font-bold text-red-400 font-mono">{againstShares.toString()}</p>
+            </div>
+          </div>
+          {status === MarketStatus.CLAIMABLE && claimable !== undefined && (
+            <div className="pt-3 border-t border-border">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm text-muted-foreground">Claimable</p>
+                <p className="text-lg font-bold text-primary">{formatUSDT(claimable as bigint)}</p>
+              </div>
+              {hasClaimed ? (
+                <p className="text-xs text-green-400 text-center">Already claimed</p>
+              ) : (
+                <Button className="w-full" onClick={() => claimReward(viewId)} disabled={isPending || isConfirming || (claimable as bigint) === 0n}>
+                  {isPending || isConfirming ? "Claiming..." : "Claim Reward"}
+                </Button>
+              )}
+              {isSuccess && <p className="text-xs text-green-400 text-center mt-2">Claimed!</p>}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MarketStatePanel({ viewId, status }: { viewId: bigint; status: MarketStatus }) {
+  const { lockMarket, isPending: locking } = useLockMarket();
+  const { settleMarket, isPending: settling } = useSettleMarket();
+  return (
+    <div className="bg-card border border-border rounded-xl p-5">
+      <h3 className="text-sm font-medium mb-4">Market Actions</h3>
+      <div className="space-y-2">
+        {status === MarketStatus.ACTIVE && (
+          <div>
+            <p className="text-xs text-muted-foreground mb-2">Anyone can lock the market after end time.</p>
+            <Button variant="outline" size="sm" className="w-full" onClick={() => lockMarket(viewId)} disabled={locking}>
+              {locking ? "Locking..." : "Lock Market"}
+            </Button>
+          </div>
+        )}
+        {status === MarketStatus.LOCKED && (
+          <div>
+            <p className="text-xs text-muted-foreground mb-2">Market is locked. Settlement can now be triggered.</p>
+            <Button variant="outline" size="sm" className="w-full" onClick={() => settleMarket(viewId)} disabled={settling}>
+              {settling ? "Settling..." : "Trigger Settlement"}
+            </Button>
+          </div>
+        )}
+        {status === MarketStatus.SETTLEMENT && <p className="text-xs text-muted-foreground">Settlement in progress...</p>}
+        {status === MarketStatus.CLAIMABLE && <p className="text-xs text-green-400">Settlement complete. Claims are open.</p>}
+      </div>
+    </div>
+  );
+}
+
+export default function ViewDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const [, navigate] = useLocation();
+  const viewId = id ? BigInt(id) : undefined;
+  const { data: viewData, isLoading, error } = useViewData(viewId);
+
+  if (isLoading) {
+    return (
+      <DAppLayout>
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-32 w-full" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4"><Skeleton className="h-40 w-full" /><Skeleton className="h-60 w-full" /></div>
+            <div className="space-y-4"><Skeleton className="h-40 w-full" /><Skeleton className="h-40 w-full" /></div>
+          </div>
+        </div>
+      </DAppLayout>
+    );
+  }
+
+  if (error || !viewData) {
+    return (
+      <DAppLayout>
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <AlertCircle className="w-12 h-12 text-destructive mb-4" />
+          <h2 className="text-xl font-bold mb-2">View Not Found</h2>
+          <p className="text-muted-foreground text-sm mb-6">View #{id} does not exist or could not be loaded.</p>
+          <Button onClick={() => navigate("/app/explore")}>Back to Discover</Button>
+        </div>
+      </DAppLayout>
+    );
+  }
+
+  const { record, state, yesPrice, noPrice, vaultBalance, metadata } = viewData;
+  const title = metadata?.title || `View #${record.viewId.toString()}`;
+  const description = metadata?.description || record.metadataURI;
+  const isActive = state.status === MarketStatus.ACTIVE;
+  const endTime = record.endTime > 0n ? new Date(Number(record.endTime) * 1000) : null;
+  const startTime = record.startTime > 0n ? new Date(Number(record.startTime) * 1000) : null;
+
+  return (
+    <DAppLayout>
+      <button onClick={() => navigate("/app/explore")} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
+        <ArrowLeft className="w-4 h-4" />Back to Discover
+      </button>
+
+      <div className="mb-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-xs text-muted-foreground font-mono">View #{record.viewId.toString()}</span>
+              <StatusBadge status={state.status} />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+            <p className="text-muted-foreground mt-2 text-sm">{description}</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-4 mt-4 text-xs text-muted-foreground">
+          <span>Fee Recipient: <a href={`https://sepolia.etherscan.io/address/${record.feeRecipient}`} target="_blank" rel="noopener noreferrer" className="font-mono text-primary hover:underline inline-flex items-center gap-1">{record.feeRecipient.slice(0, 8)}...{record.feeRecipient.slice(-6)}<ExternalLink className="w-3 h-3" /></a></span>
+          {startTime && <span>Started: {startTime.toLocaleDateString()}</span>}
+          {endTime && <span className={endTime < new Date() ? "text-red-400" : ""}>{endTime < new Date() ? "Ended" : "Ends"}: {endTime.toLocaleDateString()}</span>}
+          <a href={`https://sepolia.etherscan.io/address/${record.vault}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">Vault <ExternalLink className="w-3 h-3" /></a>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-5">
+          <PriceDisplay yesPrice={yesPrice} noPrice={noPrice} pulseIndex={state.lastPulseIndex} />
+          <div className="bg-card border border-border rounded-xl p-5">
+            <h3 className="text-sm font-medium mb-4">Market Statistics</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div><p className="text-xs text-muted-foreground">Total Liquidity</p><p className="text-lg font-bold">{formatUSDT(vaultBalance)}</p></div>
+              <div><p className="text-xs text-muted-foreground">Reserve Balance</p><p className="text-lg font-bold">{formatUSDT(state.reserveBalance)}</p></div>
+              <div><p className="text-xs text-muted-foreground">YES Supply</p><p className="text-lg font-bold text-green-400 font-mono">{state.forSupply.toString()}</p></div>
+              <div><p className="text-xs text-muted-foreground">NO Supply</p><p className="text-lg font-bold text-red-400 font-mono">{state.againstSupply.toString()}</p></div>
+              <div><p className="text-xs text-muted-foreground">Total Fee</p><p className="text-lg font-bold">1%</p></div>
+              <div><p className="text-xs text-muted-foreground">View Type</p><p className="text-lg font-bold">{record.viewType === 0 ? "Fixed" : "Permanent"}</p></div>
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-5">
+            <h3 className="text-sm font-medium mb-4">On-chain Details</h3>
+            <div className="space-y-2 text-xs font-mono">
+              <div className="flex justify-between items-center py-1.5 border-b border-border">
+                <span className="text-muted-foreground">PulseFactory</span>
+                <a href={`https://sepolia.etherscan.io/address/${CONTRACT_ADDRESSES[sepolia.id].PulseFactory}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{CONTRACT_ADDRESSES[sepolia.id].PulseFactory.slice(0, 10)}...</a>
+              </div>
+              <div className="flex justify-between items-center py-1.5 border-b border-border">
+                <span className="text-muted-foreground">TradingEngine</span>
+                <a href={`https://sepolia.etherscan.io/address/${CONTRACT_ADDRESSES[sepolia.id].TradingEngine}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{CONTRACT_ADDRESSES[sepolia.id].TradingEngine.slice(0, 10)}...</a>
+              </div>
+              <div className="flex justify-between items-center py-1.5">
+                <span className="text-muted-foreground">MockUSDT</span>
+                <a href={`https://sepolia.etherscan.io/address/${CONTRACT_ADDRESSES[sepolia.id].MockUSDT}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{CONTRACT_ADDRESSES[sepolia.id].MockUSDT.slice(0, 10)}...</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-4">
+          <TradePanel viewId={record.viewId} isActive={isActive} />
+          <PositionPanel viewId={record.viewId} status={state.status} />
+          <MarketStatePanel viewId={record.viewId} status={state.status} />
+        </div>
+      </div>
+    </DAppLayout>
   );
 }

@@ -1,206 +1,222 @@
-import { MainLayout } from "@/layouts";
-import { LoadingState } from "@/components/states";
-import { EmptyState } from "@/components/states";
-import { ViewCard } from "@/components/cards/ViewCard";
-import { MetricCard } from "@/components/cards/MetricCard";
+/**
+ * Discover Page — Protocol-aligned (Pulse V1 be73488)
+ * Data source: Sepolia RPC via wagmi/viem
+ */
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { DAppLayout } from "@/layouts/DAppLayout";
+import { ProtocolViewCard } from "@/components/cards/ProtocolViewCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Plus } from "lucide-react";
-import { mockViews } from "@/mock/views";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAllViews } from "@/hooks/useViewList";
+import { useTotalViews } from "@/hooks/useProtocol";
+import { formatUSDT, MarketStatus } from "@/config/contracts";
+import { Search, Plus, Activity, Layers } from "lucide-react";
+import type { ViewData } from "@/types/protocol";
 
-/**
- * Discover 页面
- *
- * 应用首页，展示市场中的观点。
- * 包含：Protocol Stats、Search、Trending Views、Featured Views、Categories
- *
- * @component
- */
+type FilterType = "all" | "active" | "locked" | "claimable";
+
+function ProtocolStats({ views, total }: { views: ViewData[]; total: number }) {
+  const totalLiquidity = views.reduce((sum, v) => sum + v.vaultBalance, 0n);
+  const activeCount = views.filter(v => v.state.status === MarketStatus.ACTIVE).length;
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="bg-card border border-border rounded-xl p-4">
+        <p className="text-xs text-muted-foreground mb-1">Total Views</p>
+        <p className="text-2xl font-bold text-foreground">{total}</p>
+        <p className="text-xs text-muted-foreground mt-1">on Sepolia</p>
+      </div>
+      <div className="bg-card border border-border rounded-xl p-4">
+        <p className="text-xs text-muted-foreground mb-1">Active Markets</p>
+        <p className="text-2xl font-bold text-green-400">{activeCount}</p>
+        <p className="text-xs text-muted-foreground mt-1">trading open</p>
+      </div>
+      <div className="bg-card border border-border rounded-xl p-4">
+        <p className="text-xs text-muted-foreground mb-1">Total Liquidity</p>
+        <p className="text-2xl font-bold text-primary">{formatUSDT(totalLiquidity)}</p>
+        <p className="text-xs text-muted-foreground mt-1">MockUSDT</p>
+      </div>
+      <div className="bg-card border border-border rounded-xl p-4">
+        <p className="text-xs text-muted-foreground mb-1">Network</p>
+        <p className="text-lg font-bold text-foreground">Sepolia</p>
+        <p className="text-xs text-muted-foreground mt-1">Chain ID: 11155111</p>
+      </div>
+    </div>
+  );
+}
+
+function ViewCardSkeleton() {
+  return (
+    <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+      <div className="flex justify-between">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-12" />
+      </div>
+      <Skeleton className="h-5 w-3/4" />
+      <Skeleton className="h-3 w-full" />
+      <div className="space-y-2 pt-2">
+        <Skeleton className="h-2 w-full" />
+        <Skeleton className="h-2 w-full" />
+      </div>
+      <div className="grid grid-cols-2 gap-2 pt-2">
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
+  return (
+    <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
+      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+        <Layers className="w-8 h-8 text-muted-foreground" />
+      </div>
+      <h3 className="text-lg font-semibold mb-2">No Views Yet</h3>
+      <p className="text-muted-foreground text-sm mb-6 max-w-sm">
+        No prediction markets have been created on this network yet. Be the first to create a View.
+      </p>
+      <Button onClick={onCreateClick} className="gap-2">
+        <Plus className="w-4 h-4" />
+        Create First View
+      </Button>
+    </div>
+  );
+}
+
+function FilterTabs({
+  active,
+  onChange,
+  counts,
+}: {
+  active: FilterType;
+  onChange: (f: FilterType) => void;
+  counts: Record<FilterType, number>;
+}) {
+  const tabs: { key: FilterType; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "active", label: "Active" },
+    { key: "locked", label: "Locked" },
+    { key: "claimable", label: "Claimable" },
+  ];
+  return (
+    <div className="flex gap-2 flex-wrap">
+      {tabs.map(tab => (
+        <button
+          key={tab.key}
+          onClick={() => onChange(tab.key)}
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            active === tab.key
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {tab.label}
+          {counts[tab.key] > 0 && (
+            <span className="ml-1.5 text-xs opacity-70">({counts[tab.key]})</span>
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function DiscoverPage() {
-  const isLoading = false;
-  const views = mockViews.slice(0, 6);
+  const [, navigate] = useLocation();
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<FilterType>("all");
 
-  // 计算协议统计数据
-  const protocolStats = {
-    totalTVL: mockViews.reduce((sum, v) => sum + v.metrics.tvl, 0),
-    total24hVolume: mockViews.reduce((sum, v) => sum + v.metrics.volume24h, 0),
-    activeViews: mockViews.length,
-    totalCreators: new Set(mockViews.map(v => v.creator.address)).size,
+  const { views, isLoading, error, total } = useAllViews(50);
+  const { data: totalData } = useTotalViews();
+  const totalViews = totalData ? Number(totalData as bigint) : total;
+
+  const filteredViews = views.filter(v => {
+    if (filter === "active" && v.state.status !== MarketStatus.ACTIVE) return false;
+    if (filter === "locked" && v.state.status !== MarketStatus.LOCKED) return false;
+    if (filter === "claimable" && v.state.status !== MarketStatus.CLAIMABLE) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const title = v.metadata?.title || "";
+      const uri = v.record.metadataURI.toLowerCase();
+      const id = v.record.viewId.toString();
+      if (!title.toLowerCase().includes(q) && !uri.includes(q) && !id.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const counts: Record<FilterType, number> = {
+    all: views.length,
+    active: views.filter(v => v.state.status === MarketStatus.ACTIVE).length,
+    locked: views.filter(v => v.state.status === MarketStatus.LOCKED).length,
+    claimable: views.filter(v => v.state.status === MarketStatus.CLAIMABLE).length,
   };
 
   return (
-    <MainLayout>
-      {/* Protocol Stats Section */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-6">Protocol Statistics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard
-            label="Total TVL"
-            value={`$${(protocolStats.totalTVL / 1000000).toFixed(1)}M`}
-            dataType="currency"
-            change={12.5}
-            changeLabel="+12.5% (24h)"
-          />
-          <MetricCard
-            label="24h Volume"
-            value={`$${(protocolStats.total24hVolume / 1000000).toFixed(1)}M`}
-            dataType="currency"
-            change={8.3}
-            changeLabel="+8.3% (24h)"
-          />
-          <MetricCard
-            label="Active Views"
-            value={protocolStats.activeViews.toString()}
-            dataType="text"
-            change={-2.1}
-            changeLabel="-2.1% (24h)"
-          />
-          <MetricCard
-            label="Total Creators"
-            value={protocolStats.totalCreators.toString()}
-            dataType="text"
-            change={5.7}
-            changeLabel="+5.7% (24h)"
+    <DAppLayout>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Discover</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Prediction markets on Pulse Protocol V1
+          </p>
+        </div>
+        <Button
+          onClick={() => navigate("/app/create")}
+          className="gap-2 bg-gradient-to-r from-primary to-primary-dark hover:opacity-90"
+        >
+          <Plus className="w-4 h-4" />
+          Create View
+        </Button>
+      </div>
+
+      {!isLoading && <ProtocolStats views={views} total={totalViews} />}
+
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by View ID or metadata..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-9"
           />
         </div>
-      </section>
+        <FilterTabs active={filter} onChange={setFilter} counts={counts} />
+      </div>
 
-      {/* Search & Filter Section */}
-      <section className="mb-12">
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Search views, creators, topics..."
-              className="flex-1"
-            />
-            <Button variant="default" size="lg">
-              <Plus className="w-4 h-4 mr-2" />
-              Create View
-            </Button>
-          </div>
-
-          {/* Filter Tags */}
-          <div className="flex gap-2 flex-wrap">
-            <Badge variant="outline">All</Badge>
-            <Badge variant="secondary">Trending</Badge>
-            <Badge variant="secondary">Featured</Badge>
-            <Badge variant="secondary">New</Badge>
+      {error && (
+        <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 mb-6 flex items-center gap-3">
+          <Activity className="w-5 h-5 text-destructive flex-shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-destructive">Failed to load views</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Connect your wallet to Sepolia testnet to view live data.
+            </p>
           </div>
         </div>
-      </section>
+      )}
 
-      {/* Trending Views Section */}
-      <section className="mb-12">
-        <div className="flex items-center gap-2 mb-6">
-          <TrendingUp className="w-5 h-5 text-accent" />
-          <h2 className="text-2xl font-bold">Trending Convictions</h2>
-        </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {isLoading ? (
-          <LoadingState type="skeleton" count={6} />
-        ) : views.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {views.map(view => (
-              <ViewCard
-                key={view.id}
-                view={view}
-                metrics={[
-                  {
-                    id: "price",
-                    label: "Long Price",
-                    value: `$${view.pool.longPrice.toFixed(2)}`,
-                    type: "currency",
-                  },
-                  {
-                    id: "change",
-                    label: "Change 24h",
-                    value: `${view.metrics.change24h}%`,
-                    type: "percentage",
-                  },
-                  {
-                    id: "tvl",
-                    label: "TVL",
-                    value: `$${(view.metrics.tvl / 1000000).toFixed(1)}M`,
-                    type: "currency",
-                  },
-                  {
-                    id: "volume",
-                    label: "24h Volume",
-                    value: `$${(view.metrics.volume24h / 1000000).toFixed(2)}M`,
-                    type: "currency",
-                  },
-                ]}
-                onClick={() => {
-                  // Navigate to view detail
-                  console.log("View detail:", view.id);
-                }}
-              />
-            ))}
-          </div>
+          Array.from({ length: 6 }).map((_, i) => <ViewCardSkeleton key={i} />)
+        ) : filteredViews.length === 0 ? (
+          <EmptyState onCreateClick={() => navigate("/app/create")} />
         ) : (
-          <EmptyState title="No views found" />
-        )}
-      </section>
-
-      {/* Featured Views Section */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-6">Featured Views</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {views.slice(0, 3).map(view => (
-            <ViewCard
-              key={view.id}
-              view={view}
-              metrics={[
-                {
-                  id: "price",
-                  label: "Long Price",
-                  value: `$${view.pool.longPrice.toFixed(2)}`,
-                  type: "currency",
-                },
-                {
-                  id: "tvl",
-                  label: "TVL",
-                  value: `$${(view.metrics.tvl / 1000000).toFixed(1)}M`,
-                  type: "currency",
-                },
-                {
-                  id: "participants",
-                  label: "Participants",
-                  value: view.metrics.participants.toString(),
-                  type: "number",
-                },
-              ]}
-              onClick={() => {
-                console.log("View detail:", view.id);
-              }}
+          filteredViews.map(viewData => (
+            <ProtocolViewCard
+              key={viewData.record.viewId.toString()}
+              viewData={viewData}
             />
-          ))}
-        </div>
-      </section>
+          ))
+        )}
+      </div>
 
-      {/* Categories Section */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-6">Browse by Category</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {[
-            "Crypto",
-            "Politics",
-            "Sports",
-            "Finance",
-            "Technology",
-            "Entertainment",
-          ].map(category => (
-            <button
-              key={category}
-              className="p-4 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground transition-colors text-center font-medium"
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </section>
-    </MainLayout>
+      {!isLoading && filteredViews.length > 0 && (
+        <p className="text-center text-xs text-muted-foreground mt-8">
+          Showing {filteredViews.length} of {totalViews} views · Live from Sepolia
+        </p>
+      )}
+    </DAppLayout>
   );
 }
