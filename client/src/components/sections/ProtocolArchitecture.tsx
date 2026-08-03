@@ -14,7 +14,7 @@ const architectureSteps = [
   },
   {
     title: "Trading Engine",
-    description: "Execute trades with automated market making",
+    description: "Express opinions with automated market making",
   },
   {
     title: "Price Engine",

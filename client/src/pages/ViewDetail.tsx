@@ -94,7 +94,7 @@ function PriceDisplay({ yesPrice, noPrice, pulseIndex }: { yesPrice: number; noP
 
 function TradePanel({ viewId, isActive }: { viewId: bigint; isActive: boolean }) {
   const { isConnected } = useAccount();
-  const [tradeTab, setTradeTab] = useState<"buy" | "sell">("buy");
+  const [tradeTab, setTradeTab] = useState<"support" | "exit">("buy");
   const [side, setSide] = useState<0 | 1>(0);
   const [amount, setAmount] = useState("");
   const [shares, setShares] = useState("");
@@ -130,16 +130,16 @@ function TradePanel({ viewId, isActive }: { viewId: bigint; isActive: boolean })
 
   return (
     <div className="bg-card border border-border rounded-xl p-5">
-      <Tabs value={tradeTab} onValueChange={v => setTradeTab(v as "buy" | "sell")}>
+      <Tabs value={tradeTab} onValueChange={v => setTradeTab(v as "support" | "exit")}>
         <TabsList className="grid grid-cols-2 w-full mb-4">
-          <TabsTrigger value="buy">Buy</TabsTrigger>
-          <TabsTrigger value="sell">Sell</TabsTrigger>
+          <TabsTrigger value="support">Support</TabsTrigger>
+          <TabsTrigger value="exit">Exit</TabsTrigger>
         </TabsList>
         <div className="grid grid-cols-2 gap-2 mb-4">
           <button onClick={() => setSide(0)} className={`py-2 rounded-lg text-sm font-medium transition-colors border ${side === 0 ? "bg-green-500/20 text-green-400 border-green-500/40" : "bg-muted text-muted-foreground border-border"}`}>YES</button>
           <button onClick={() => setSide(1)} className={`py-2 rounded-lg text-sm font-medium transition-colors border ${side === 1 ? "bg-red-500/20 text-red-400 border-red-500/40" : "bg-muted text-muted-foreground border-border"}`}>NO</button>
         </div>
-        <TabsContent value="buy" className="space-y-3">
+        <TabsContent value="support" className="space-y-3">
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">Amount (USDT)</label>
             <Input type="number" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} className="font-mono" />
@@ -151,19 +151,19 @@ function TradePanel({ viewId, isActive }: { viewId: bigint; isActive: boolean })
             </Button>
           ) : (
             <Button className={`w-full ${side === 0 ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`} onClick={() => buy({ viewId, side, amountIn: amountBigInt, minSharesOut: 0n })} disabled={buying || buyConfirming || !amount || amountBigInt === 0n}>
-              {buying || buyConfirming ? "Confirming..." : `Buy ${side === 0 ? "YES" : "NO"}`}
+              {buying || buyConfirming ? "Confirming..." : `Support ${side === 0 ? "FOR" : "AGAINST"}`}
             </Button>
           )}
           {bought && <p className="text-xs text-green-400 text-center">Transaction confirmed!</p>}
         </TabsContent>
-        <TabsContent value="sell" className="space-y-3">
+        <TabsContent value="exit" className="space-y-3">
           <div>
-            <label className="text-xs text-muted-foreground mb-1 block">Shares to sell</label>
+            <label className="text-xs text-muted-foreground mb-1 block">Shares to exit</label>
             <Input type="number" placeholder="0" value={shares} onChange={e => setShares(e.target.value)} className="font-mono" />
-            <p className="text-xs text-muted-foreground mt-1">Your {side === 0 ? "YES" : "NO"} shares: <span className="font-mono">{currentShares.toString()}</span></p>
+            <p className="text-xs text-muted-foreground mt-1">Your {side === 0 ? "FOR" : "AGAINST"} shares: <span className="font-mono">{currentShares.toString()}</span></p>
           </div>
           <Button className="w-full" variant="outline" onClick={() => sell({ viewId, side, sharesIn: shares ? BigInt(shares) : 0n, minAmountOut: 0n })} disabled={selling || sellConfirming || !shares}>
-            {selling || sellConfirming ? "Confirming..." : `Sell ${side === 0 ? "YES" : "NO"}`}
+            {selling || sellConfirming ? "Confirming..." : `Exit ${side === 0 ? "FOR" : "AGAINST"}`}
           </Button>
           {sold && <p className="text-xs text-green-400 text-center">Transaction confirmed!</p>}
         </TabsContent>
@@ -199,11 +199,11 @@ function PositionPanel({ viewId, status }: { viewId: bigint; status: MarketStatu
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-              <p className="text-xs text-muted-foreground">YES Shares</p>
+              <p className="text-xs text-muted-foreground">FOR Shares</p>
               <p className="text-lg font-bold text-green-400 font-mono">{forShares.toString()}</p>
             </div>
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-              <p className="text-xs text-muted-foreground">NO Shares</p>
+              <p className="text-xs text-muted-foreground">AGAINST Shares</p>
               <p className="text-lg font-bold text-red-400 font-mono">{againstShares.toString()}</p>
             </div>
           </div>

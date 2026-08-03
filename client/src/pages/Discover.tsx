@@ -75,7 +75,7 @@ function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
       </div>
       <h3 className="text-lg font-semibold mb-2">No Views Yet</h3>
       <p className="text-muted-foreground text-sm mb-6 max-w-sm">
-        No prediction markets have been created on this network yet. Be the first to create a View.
+        No opinion markets have been created on this network yet. Be the first to create a View.
       </p>
       <Button onClick={onCreateClick} className="gap-2">
         <Plus className="w-4 h-4" />
@@ -158,7 +158,7 @@ export default function DiscoverPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Discover</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Prediction markets on Pulse Protocol V1
+            Opinion markets on Pulse Protocol V1
           </p>
         </div>
         <Button

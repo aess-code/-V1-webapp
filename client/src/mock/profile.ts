@@ -38,7 +38,7 @@ export const mockUserProfile: UserProfile = {
   address: "0x1234...5678",
   username: "CryptoVisioneer",
   avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=profile",
-  bio: "Web3 analyst, market predictor, and protocol enthusiast. Building the future of decentralized markets.",
+  bio: "Web3 analyst, opinion analyst, and protocol enthusiast. Building the future of decentralized markets.",
   followers: 12500,
   following: 450,
   joinedDate: "2023-06-15T00:00:00Z",
@@ -112,7 +112,7 @@ export const mockAchievements: Achievement[] = [
   },
   {
     id: "4",
-    title: "Legendary Predictor",
+    title: "Legendary Participant",
     description: "Achieved 80%+ win rate",
     icon: "⭐",
     unlockedAt: "2024-07-20T00:00:00Z",

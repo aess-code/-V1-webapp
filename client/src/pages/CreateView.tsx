@@ -168,7 +168,7 @@ export default function CreateViewPage() {
           </div>
           <h2 className="text-2xl font-bold mb-3">View Created!</h2>
           <p className="text-muted-foreground text-sm mb-6">
-            Your prediction market has been deployed on Sepolia.
+            Your opinion market (View) has been deployed on Sepolia.
           </p>
           {createHash && (
             <a
@@ -207,7 +207,7 @@ export default function CreateViewPage() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-foreground">Create View</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Deploy a new prediction market on Pulse Protocol V1
+            Create a new View on Pulse Protocol V1
           </p>
         </div>
 

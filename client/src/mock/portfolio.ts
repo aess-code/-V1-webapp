@@ -13,7 +13,7 @@ export interface PortfolioPosition {
 
 export interface PortfolioActivity {
   id: string;
-  type: "buy" | "sell" | "claim";
+  type: "support" | "exit" | "claim";
   viewTitle: string;
   amount: number;
   price: number;
