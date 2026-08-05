@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { brand } from "@/config/brand";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 /**
  * Hero Section - Minimalist Protocol Aesthetic
@@ -122,6 +124,9 @@ export default function Hero() {
           >
             Enter App
           </Button>
+          <div className="scale-110">
+            <ConnectButton />
+          </div>
         </motion.div>
 
         {/* Scroll Indicator */}

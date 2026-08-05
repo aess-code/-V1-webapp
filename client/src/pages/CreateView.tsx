@@ -10,6 +10,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { DAppLayout } from "@/layouts/DAppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -165,7 +166,8 @@ export default function CreateViewPage() {
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
           <h2 className="text-xl font-bold mb-2">Wallet Required</h2>
-          <p className="text-muted-foreground text-sm">Connect your wallet to Sepolia to create a View.</p>
+          <p className="text-muted-foreground text-sm mb-6">Connect your wallet to Sepolia to create a View.</p>
+          <ConnectButton />
         </div>
       </DAppLayout>
     );

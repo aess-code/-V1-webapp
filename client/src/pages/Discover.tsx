@@ -4,6 +4,7 @@
  */
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { DAppLayout } from "@/layouts/DAppLayout";
 import { ProtocolViewCard } from "@/components/cards/ProtocolViewCard";
 import { Button } from "@/components/ui/button";
@@ -190,9 +191,10 @@ export default function DiscoverPage() {
           <Activity className="w-5 h-5 text-destructive flex-shrink-0" />
           <div>
             <p className="text-sm font-medium text-destructive">Failed to load views</p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1 mb-3">
               Connect your wallet to Sepolia testnet to view live data.
             </p>
+            <ConnectButton />
           </div>
         </div>
       )}
