@@ -146,7 +146,26 @@ function TradePanel({ viewId, isActive }: { viewId: bigint; isActive: boolean })
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">Amount (USDT)</label>
             <Input type="number" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} className="font-mono" />
-            {usdtBalance !== undefined && <p className="text-xs text-muted-foreground mt-1">Balance: {formatUSDT(usdtBalance as bigint)}</p>}
+            <div className="flex justify-between items-center mt-1.5">
+              {usdtBalance !== undefined && <p className="text-[10px] text-muted-foreground">Balance: {formatUSDT(usdtBalance as bigint)}</p>}
+              <div className="flex gap-1">
+                {[25, 50, 75, 100].map((pct) => (
+                  <button
+                    key={pct}
+                    onClick={() => {
+                      if (usdtBalance) {
+                        const bal = usdtBalance as bigint;
+                        const val = (bal * BigInt(pct)) / 100n;
+                        setAmount((Number(val) / 1000000).toString());
+                      }
+                    }}
+                    className="px-1.5 py-0.5 rounded bg-muted hover:bg-primary/20 text-[10px] text-muted-foreground hover:text-primary transition-colors border border-border"
+                  >
+                    {pct === 100 ? "MAX" : `${pct}%`}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           {needsApproval ? (
             <Button className="w-full" onClick={() => approve(amountBigInt)} disabled={approving || approveConfirming || !amount}>
@@ -163,7 +182,23 @@ function TradePanel({ viewId, isActive }: { viewId: bigint; isActive: boolean })
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">Shares to exit</label>
             <Input type="number" placeholder="0" value={shares} onChange={e => setShares(e.target.value)} className="font-mono" />
-            <p className="text-xs text-muted-foreground mt-1">Your {side === 0 ? "FOR" : "AGAINST"} shares: <span className="font-mono">{currentShares.toString()}</span></p>
+            <div className="flex justify-between items-center mt-1.5">
+              <p className="text-[10px] text-muted-foreground">Your {side === 0 ? "FOR" : "AGAINST"} shares: <span className="font-mono">{currentShares.toString()}</span></p>
+              <div className="flex gap-1">
+                {[25, 50, 75, 100].map((pct) => (
+                  <button
+                    key={pct}
+                    onClick={() => {
+                      const val = (currentShares * BigInt(pct)) / 100n;
+                      setShares(val.toString());
+                    }}
+                    className="px-1.5 py-0.5 rounded bg-muted hover:bg-primary/20 text-[10px] text-muted-foreground hover:text-primary transition-colors border border-border"
+                  >
+                    {pct === 100 ? "MAX" : `${pct}%`}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           <Button className="w-full" variant="outline" onClick={() => sell({ viewId, side, sharesIn: shares ? BigInt(shares) : 0n, minAmountOut: 0n })} disabled={selling || sellConfirming || !shares}>
             {selling || sellConfirming ? "Confirming..." : `Exit ${side === 0 ? "FOR" : "AGAINST"}`}
