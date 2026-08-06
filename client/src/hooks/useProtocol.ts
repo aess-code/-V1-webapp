@@ -10,7 +10,7 @@
 
 import { useReadContract, useReadContracts, useAccount, useChainId } from "wagmi";
 import { sepolia } from "wagmi/chains";
-import { PulseFactoryABI, TradingEngineABI, SettlementManagerABI, MockUSDTABI } from "@/config/abis";
+import { PulseFactoryABI, TradingEngineABI, SettlementManagerABI, FeeManagerABI, MockUSDTABI } from "@/config/abis";
 import { CONTRACT_ADDRESSES, pulseIndexToPrices, MarketStatus } from "@/config/contracts";
 import type { ViewRecord, MarketState, Position, ViewData } from "@/types/protocol";
 
@@ -226,6 +226,27 @@ export function useHasClaimed(viewId: bigint | undefined, userAddress?: `0x${str
     functionName: "hasClaimed",
     args: viewId !== undefined && user ? [viewId, user] : undefined,
     query: { enabled: viewId !== undefined && !!user },
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FeeManager Hooks
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Get pending claimable fees for the creator of a view */
+export function usePendingCreatorFees(viewId: bigint | undefined, userAddress?: `0x${string}`) {
+  const { address } = useAccount();
+  const addrs = useAddresses();
+  const user = userAddress ?? address;
+  return useReadContract({
+    address: addrs.FeeManager,
+    abi: FeeManagerABI,
+    functionName: "pendingFeeRecipientFees",
+    args: viewId !== undefined && user ? [viewId, user] : undefined,
+    query: {
+      enabled: viewId !== undefined && !!user,
+      refetchInterval: 30_000,
+    },
   });
 }
 

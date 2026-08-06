@@ -13,6 +13,7 @@ import {
   TradingEngineABI,
   SettlementManagerABI,
   PulseFactoryABI,
+  FeeManagerABI,
   MockUSDTABI,
 } from "@/config/abis";
 import { CONTRACT_ADDRESSES } from "@/config/contracts";
@@ -207,4 +208,26 @@ export function useApproveUSDTForFactory() {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
   return { approve, hash, isPending, isConfirming, isSuccess, error };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FeeManager Writes
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function useClaimCreatorFees() {
+  const addrs = useAddresses();
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+
+  const claim = (viewId: bigint) => {
+    writeContract({
+      address: addrs.FeeManager,
+      abi: FeeManagerABI,
+      functionName: "claimFeeRecipientFee",
+      args: [viewId],
+    });
+  };
+
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  return { claim, hash, isPending, isConfirming, isSuccess, error };
 }

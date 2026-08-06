@@ -96,10 +96,14 @@ function PriceBar({ yesPrice, noPrice }: { yesPrice: number; noPrice: number }) 
 function ShareButton({ viewId, title }: { viewId: string; title: string }) {
   const [copied, setCopied] = useState(false);
   const url = typeof window !== "undefined" ? `${window.location.origin}/app/view/${viewId}` : "";
-  const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(`Check out this View on Pulse Protocol: ${title}`)}&url=${encodeURIComponent(url)}`;
+  
+  // Dynamic Tweet Template
+  const tweetText = `${title} —— 正在 @BuildOnPulse 形成的去中心化共识。🌐\n\n在不受干预的协议中，让见解成为永恒资产。\n\nVIEW. ANALYZE. COMMIT. BELIEVE.\n\n参与讨论: ${url}\n\n#PulseProtocol #Web3 #Consensus`;
+  const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+  
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(url).then(() => {
+    navigator.clipboard.writeText(tweetText).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });

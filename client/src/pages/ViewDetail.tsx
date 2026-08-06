@@ -19,6 +19,7 @@ import {
   useUSDTAllowance,
   useClaimableAmount,
   useHasClaimed,
+  usePendingCreatorFees,
 } from "@/hooks/useProtocol";
 import {
   useBuy,
@@ -27,6 +28,7 @@ import {
   useClaimReward,
   useLockMarket,
   useSettleMarket,
+  useClaimCreatorFees,
 } from "@/hooks/useProtocolWrite";
 import {
   MarketStatus,
@@ -45,6 +47,7 @@ import {
   Share2,
   Copy,
   Check,
+  User,
 } from "lucide-react";
 
 function StatusBadge({ status }: { status: MarketStatus }) {
@@ -267,6 +270,57 @@ function PositionPanel({ viewId, status }: { viewId: bigint; status: MarketStatu
   );
 }
 
+function CreatorFeePanel({ viewId, creatorAddress }: { viewId: bigint; creatorAddress: `0x${string}` }) {
+  const { address, isConnected } = useAccount();
+  const { data: pendingFees } = usePendingCreatorFees(viewId, address);
+  const { claim, isPending, isConfirming, isSuccess } = useClaimCreatorFees();
+
+  if (!isConnected || address?.toLowerCase() !== creatorAddress.toLowerCase()) return null;
+
+  const fees = pendingFees as bigint || 0n;
+
+  return (
+    <div className="bg-card border border-primary/20 rounded-xl p-5 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 blur-2xl" />
+      <h3 className="text-sm font-medium mb-4 flex items-center gap-2 text-primary">
+        <ExternalLink className="w-4 h-4" />
+        Creator Rewards
+      </h3>
+      <div className="space-y-3">
+        <div className="flex justify-between items-end">
+          <div>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Pending Fees</p>
+            <p className="text-2xl font-bold text-foreground font-mono">{formatUSDT(fees)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Your Share</p>
+            <p className="text-xs font-medium text-primary">0.7% of Volume</p>
+          </div>
+        </div>
+        
+        <Button 
+          className="w-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20" 
+          variant="ghost"
+          onClick={() => claim(viewId)}
+          disabled={isPending || isConfirming || fees === 0n}
+        >
+          {isPending || isConfirming ? "Claiming..." : "Claim Creator Fees"}
+        </Button>
+        
+        {isSuccess && (
+          <p className="text-[10px] text-green-400 text-center mt-2 animate-pulse">
+            Fees claimed successfully!
+          </p>
+        )}
+        
+        <p className="text-[9px] text-muted-foreground leading-tight">
+          * Fees are accumulated from every trade on this View. You can claim them at any time.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function MarketStatePanel({ viewId, status, endTime, viewType }: {
   viewId: bigint;
   status: MarketStatus;
@@ -324,10 +378,10 @@ function MarketStatePanel({ viewId, status, endTime, viewType }: {
           </div>
         )}
         {status === MarketStatus.SETTLEMENT && (
-          <p className="text-xs text-muted-foreground">Settlement in progress...</p>
+          <p className="text-xs text-muted-foreground">Market is in settlement phase. Rewards will be claimable soon.</p>
         )}
         {status === MarketStatus.CLAIMABLE && (
-          <p className="text-xs text-green-400">Settlement complete. Claims are open.</p>
+          <p className="text-xs text-green-400">Market settled. Rewards are available for winners.</p>
         )}
       </div>
     </div>
@@ -337,7 +391,8 @@ function MarketStatePanel({ viewId, status, endTime, viewType }: {
 export default function ViewDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
-  const viewId = id ? BigInt(id) : undefined;
+  const { isConnected } = useAccount();
+  const viewId = id ? BigInt(id) : 0n;
   const { data: viewData, isLoading, error } = useViewData(viewId);
   const [copied, setCopied] = useState(false);
 
@@ -374,13 +429,19 @@ export default function ViewDetailPage() {
   const description = metadata?.description || record.metadataURI;
   const isActive = state.status === MarketStatus.ACTIVE;
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-  const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(`Check out this View on Pulse Protocol: ${title}`)}&url=${encodeURIComponent(shareUrl)}`;
+  
+  // Dynamic Tweet Template
+  const tweetText = `${title} —— 正在 @BuildOnPulse 形成的去中心化共识。🌐\n\n在不受干预的协议中，让见解成为永恒资产。\n\nVIEW. ANALYZE. COMMIT. BELIEVE.\n\n参与讨论: ${shareUrl}\n\n#PulseProtocol #Web3 #Consensus`;
+  const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+  
   const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl).then(() => {
+    // Copy the same formatted text as the tweet for better sharing experience
+    navigator.clipboard.writeText(tweetText).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
   };
+
   const endTime = record.endTime > 0n ? new Date(Number(record.endTime) * 1000) : null;
   const startTime = record.startTime > 0n ? new Date(Number(record.startTime) * 1000) : null;
 
@@ -448,16 +509,20 @@ export default function ViewDetailPage() {
                 <a href={`https://sepolia.etherscan.io/address/${CONTRACT_ADDRESSES[sepolia.id].TradingEngine}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{CONTRACT_ADDRESSES[sepolia.id].TradingEngine.slice(0, 10)}...</a>
               </div>
               <div className="flex justify-between items-center py-1.5">
-                <span className="text-muted-foreground">MockUSDT</span>
-                <a href={`https://sepolia.etherscan.io/address/${CONTRACT_ADDRESSES[sepolia.id].MockUSDT}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{CONTRACT_ADDRESSES[sepolia.id].MockUSDT.slice(0, 10)}...</a>
+                <span className="text-muted-foreground">SettlementManager</span>
+                <a href={`https://sepolia.etherscan.io/address/${record.settlementManager}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{record.settlementManager.slice(0, 10)}...</a>
               </div>
             </div>
           </div>
         </div>
-        <div className="space-y-4">
-          <TradePanel viewId={record.viewId} isActive={isActive} />
-          <PositionPanel viewId={record.viewId} status={state.status} />
-          <MarketStatePanel viewId={record.viewId} status={state.status} endTime={endTime} viewType={record.viewType} />
+
+        <div className="space-y-6">
+          <TradePanel viewId={viewId} isActive={isActive} />
+          <div className="space-y-4">
+            <PositionPanel viewId={viewId} status={state.status} />
+            <CreatorFeePanel viewId={viewId} creatorAddress={record.feeRecipient} />
+            <MarketStatePanel viewId={viewId} status={state.status} endTime={endTime} viewType={record.viewType} />
+          </div>
         </div>
       </div>
     </DAppLayout>
