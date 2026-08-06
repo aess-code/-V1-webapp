@@ -114,6 +114,7 @@ export const brand = {
     docsConstitution: 'https://github.com/aess-code/pulse-protocol-v1/blob/main/docs/Protocol_Constitution.md',
     x:                'https://x.com/buildonpulse?s=11',
     telegram:         'https://t.me/PulseProtocol_first',
+    discord:          'https://discord.gg/4efxDsw2U',
   },
   
   // ============================================================================

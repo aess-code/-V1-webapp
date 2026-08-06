@@ -1,4 +1,4 @@
-import { Twitter, Send } from "lucide-react";
+import { Twitter, Send, MessageSquare } from "lucide-react";
 import { brand } from "@/config/brand";
 import { useLocation } from "wouter";
 
@@ -60,6 +60,11 @@ export default function Footer() {
                 className="flex items-center gap-2 text-sm text-foreground/60 hover:text-foreground transition-colors">
                 <Send className="w-4 h-4" />
                 Telegram
+              </a>
+              <a href={brand.links.discord} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-foreground/60 hover:text-foreground transition-colors">
+                <MessageSquare className="w-4 h-4" />
+                Discord
               </a>
             </div>
           </div>

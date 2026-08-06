@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import { Menu, X, ChevronDown, BookOpen, Code2, FileText, Github, Send, Twitter } from "lucide-react";
+import { Menu, X, ChevronDown, BookOpen, Code2, FileText, Github, Send, Twitter, MessageSquare } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { brand } from "@/config/brand";
 
@@ -19,6 +19,7 @@ const docsItems = [
 const communityItems = [
   { label: "X (Twitter)", icon: Twitter, href: brand.links.x },
   { label: "Telegram", icon: Send, href: brand.links.telegram },
+  { label: "Discord", icon: MessageSquare, href: brand.links.discord },
 ];
 
 function DocsDropdown() {
