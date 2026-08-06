@@ -2,8 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { brand } from "@/config/brand";
-import { useAccount } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Sparkles } from "lucide-react";
 
 /**
  * Hero Section - Minimalist Protocol Aesthetic
@@ -115,30 +114,28 @@ export default function Hero() {
         {/* CTA Buttons */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          className="flex flex-col sm:flex-row gap-6 justify-center items-center"
         >
           <Button
             size="lg"
-            className="bg-gradient-to-r from-primary-light to-primary-dark hover:opacity-90 text-white px-8 py-6 text-lg font-semibold rounded-lg shadow-lg transition-all hover:shadow-xl"
+            className="bg-gradient-to-r from-primary-light to-primary-dark hover:opacity-90 text-white px-10 py-7 text-xl font-bold rounded-xl shadow-lg transition-all hover:shadow-2xl animate-shimmer glow-primary relative"
             onClick={() => navigate("/app")}
           >
             Enter App
           </Button>
-          <div className="scale-110">
-            <ConnectButton />
-          </div>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          variants={itemVariants}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <div className="w-6 h-10 border-2 border-foreground/30 rounded-full flex items-center justify-center">
-            <div className="w-1 h-2 bg-foreground/30 rounded-full" />
-          </div>
+          
+          <Button
+            variant="outline"
+            size="lg"
+            className="border-primary/40 hover:border-primary text-foreground px-8 py-7 text-lg font-medium rounded-xl transition-all hover:bg-primary/5 flex items-center gap-2 group"
+            onClick={() => {
+              // Placeholder for curator program modal/page
+              alert("先锋策展人计划即将开启，敬请期待文档更新。");
+            }}
+          >
+            <Sparkles className="w-5 h-5 text-primary group-hover:animate-pulse" />
+            先锋策展人计划
+          </Button>
         </motion.div>
       </motion.div>
     </section>
