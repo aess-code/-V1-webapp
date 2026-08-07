@@ -134,7 +134,7 @@ export default function Hero() {
             onClick={() => setIsCuratorModalOpen(true)}
           >
             <Sparkles className="w-5 h-5 text-primary group-hover:animate-pulse" />
-            先锋策展人计划
+            Pioneer Curator Program
           </Button>
         </motion.div>
       </motion.div>
