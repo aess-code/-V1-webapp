@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { brand } from "@/config/brand";
 import { Sparkles } from "lucide-react";
+import { useState } from "react";
+import CuratorModal from "@/components/modals/CuratorModal";
 
 /**
  * Hero Section - Minimalist Protocol Aesthetic
@@ -17,6 +19,7 @@ import { Sparkles } from "lucide-react";
 
 export default function Hero() {
   const [, navigate] = useLocation();
+  const [isCuratorModalOpen, setIsCuratorModalOpen] = useState(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -128,16 +131,18 @@ export default function Hero() {
             variant="outline"
             size="lg"
             className="border-primary/40 hover:border-primary text-foreground px-8 py-7 text-lg font-medium rounded-xl transition-all hover:bg-primary/5 flex items-center gap-2 group"
-            onClick={() => {
-              // Placeholder for curator program modal/page
-              alert("先锋策展人计划即将开启，敬请期待文档更新。");
-            }}
+            onClick={() => setIsCuratorModalOpen(true)}
           >
             <Sparkles className="w-5 h-5 text-primary group-hover:animate-pulse" />
             先锋策展人计划
           </Button>
         </motion.div>
       </motion.div>
+
+      <CuratorModal 
+        isOpen={isCuratorModalOpen} 
+        onClose={() => setIsCuratorModalOpen(false)} 
+      />
     </section>
   );
 }
