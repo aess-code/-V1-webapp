@@ -33,6 +33,7 @@ import {
   ExternalLink,
   Clock,
   Infinity,
+  Sparkles,
 } from "lucide-react";
 
 function StepIndicator({ step, current }: { step: number; current: number }) {
@@ -128,7 +129,7 @@ export default function CreateViewPage() {
   const isLiquidityValid = liquidityBigInt >= minLiquidity / 2n;
   const hasEnoughBalance = usdtBalance !== undefined && (usdtBalance as bigint) >= totalLiquidity;
   const durationHoursNum = Number(durationHours) || 0;
-  const isDurationValid = viewType === ViewType.PERMANENT || durationHoursNum >= 1;
+  const isDurationValid = viewType === ViewType.PERMANENT || durationHoursNum >= 1.5;
 
   useEffect(() => { if (approved && step === 2) setStep(3); }, [approved]);
   useEffect(() => { if (created && step === 3) setStep(4); }, [created]);
@@ -261,11 +262,11 @@ export default function CreateViewPage() {
             </div>
             {viewType === ViewType.FIXED && (
               <div>
-                <label className="text-sm text-muted-foreground mb-2 block">Duration (hours, minimum 1)</label>
-                <Input type="number" min="1" max="8760" value={durationHours} onChange={e => setDurationHours(e.target.value)} disabled={step > 1} />
+                <label className="text-sm text-muted-foreground mb-2 block">Duration (hours, minimum 1.5)</label>
+                <Input type="number" min="1.5" step="0.5" max="8760" value={durationHours} onChange={e => setDurationHours(e.target.value)} disabled={step > 1} />
                 {!isDurationValid && durationHours && (
                   <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />Minimum duration is 1 hour (protocol requirement)
+                    <AlertCircle className="w-3 h-3" />Minimum duration is 1.5 hours (protocol requirement)
                   </p>
                 )}
               </div>
@@ -274,7 +275,16 @@ export default function CreateViewPage() {
 
           {/* Liquidity */}
           <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-            <h3 className="font-medium">Initial Liquidity</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium">Initial Liquidity</h3>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider animate-pulse">
+                <Sparkles className="w-3 h-3" />
+                0.7% Creator Reward
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground -mt-2">
+              As the creator, you will earn a 0.7% reward from every trade volume executed in this market.
+            </p>
             <div>
               <label className="text-sm text-muted-foreground mb-2 block">USDT per side (FOR + AGAINST equally)</label>
               <Input type="number" placeholder="100" value={liquidityPerSide} onChange={e => setLiquidityPerSide(e.target.value)} disabled={step > 1} className="font-mono" />
