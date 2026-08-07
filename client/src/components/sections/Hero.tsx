@@ -77,12 +77,17 @@ export default function Hero() {
         animate="visible"
       >
         {/* Logo */}
-        <motion.div variants={itemVariants} className="mb-8">
-          <div className="w-24 h-24 mx-auto rounded-full flex items-center justify-center shadow-lg" style={{ background: brand.gradients.primary, boxShadow: `0 0 30px ${brand.colors.primaryLight}80` }}>
+        <motion.div variants={itemVariants} className="mb-10">
+          <div className="w-32 h-32 mx-auto flex items-center justify-center relative">
+            {/* Soft ambient glow behind the logo to make it pop without double-bordering */}
+            <div 
+              className="absolute inset-0 rounded-full blur-3xl opacity-40 animate-pulse" 
+              style={{ background: brand.gradients.primary }} 
+            />
             <img
               src={brand.logo}
               alt={brand.name}
-              className="w-20 h-20"
+              className="w-28 h-28 relative z-10 drop-shadow-[0_0_15px_rgba(37,99,235,0.3)]"
               style={{ aspectRatio: "1 / 1" }}
             />
           </div>
