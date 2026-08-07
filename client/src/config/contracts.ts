@@ -34,6 +34,16 @@ export const CONTRACT_ADDRESSES = {
 // ─────────────────────────────────────────────────────────────────────────────
 // Protocol Constants (Immutable after deployment)
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Pioneer Curators (High-weight opinion contributors)
+// ─────────────────────────────────────────────────────────────────────────────
+export const PIONEER_CURATORS = [
+  "0x0B2141b7F564bf0Be428188c9Ba0D5De4e41342B", // Deployer
+] as const;
+
+export const isPioneer = (address: string) => 
+  PIONEER_CURATORS.some(p => p.toLowerCase() === address.toLowerCase());
+
 export const PROTOCOL_CONSTANTS = {
   /** Initial Pulse Index at market creation (50.00%) */
   INITIAL_INDEX: 5000n,

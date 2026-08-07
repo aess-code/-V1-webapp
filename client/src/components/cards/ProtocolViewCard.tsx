@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MarketStatus, formatUSDT, pulseIndexToPrices } from "@/config/contracts";
+import { MarketStatus, formatUSDT, pulseIndexToPrices, isPioneer } from "@/config/contracts";
 import type { ViewData } from "@/types/protocol";
-import { Clock, CheckCircle, Lock, TrendingUp, Share2, Copy, Check } from "lucide-react";
+import { Clock, CheckCircle, Lock, TrendingUp, Share2, Copy, Check, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
 /**
  * ProtocolViewCard
@@ -161,6 +161,12 @@ export function ProtocolViewCard({ viewData, onClick }: ProtocolViewCardProps) {
               #{record.viewId.toString()}
             </span>
             <StatusBadge status={state.status} />
+            {isPioneer(record.feeRecipient) && (
+              <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px] h-5 py-0 px-1.5 animate-pulse">
+                <Sparkles className="w-2.5 h-2.5 mr-1" />
+                Pioneer
+              </Badge>
+            )}
           </div>
           <h3 className="font-semibold text-sm line-clamp-2 text-foreground">
             {title}
